@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  TWESHA'S BIRTHDAY SURPRISE — quick customization guide
+  ============================================================
+  1. PHOTOS: search for "PHOTO PLACEHOLDER" below. Replace the
+     <div class="photo-frame"> ... </div> content with:
+       <img src="your-photo.jpg" alt="caption">
+     If hosting on GitHub Pages, just drop your images in the
+     same folder and point src="photo1.jpg" etc.
+
+  2. LOVE NOTES: search for "REP CARD CONTENT" — five cards,
+     each has a short front label and a back message. Swap the
+     placeholder text for your real reasons.
+
+  3. LOVE LETTER: search for "FINAL LETTER" near the bottom.
+
+  4. BIRTHDAY DATE: search for "BIRTHDAY TARGET" in the script
+     if you ever reuse this for a different date/timezone.
+  ============================================================
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday, Twesha 🎉</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500;1,9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF3ED;
+    --cream-2:#FFE8DE;
+    --ink:#341C2B;
+    --berry:#D6336C;
+    --berry-deep:#A81E52;
+    --coral:#FF7A59;
+    --lime:#B7E38A;
+    --gold:#FFC94D;
+    --paper:#FFFDFB;
+    --shadow: 0 20px 40px -20px rgba(52,28,43,0.35);
+    --radius: 22px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Plus Jakarta Sans', sans-serif;
+    overflow-x:hidden;
+  }
+  h1,h2,.display{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    margin:0;
+  }
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:0.22em;
+    font-size:0.72rem;
+    font-weight:700;
+    color:var(--berry-deep);
+    opacity:0.85;
+  }
+  section{
+    position:relative;
+    padding:6rem 1.5rem;
+    max-width:980px;
+    margin:0 auto;
+  }
+  canvas#confetti-canvas{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:999;
+  }
+
+  /* ---------- HERO ---------- */
+  #hero{
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding-top:4rem;
+    padding-bottom:4rem;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255,201,77,0.35), transparent 45%),
+      radial-gradient(circle at 85% 75%, rgba(183,227,138,0.35), transparent 45%),
+      linear-gradient(180deg, var(--cream) 0%, var(--cream-2) 100%);
+    overflow:hidden;
+  }
+  .hero-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:0.5rem;
+    background:var(--paper);
+    border:1px solid rgba(214,51,108,0.18);
+    padding:0.5rem 1.1rem;
+    border-radius:999px;
+    box-shadow:var(--shadow);
+    margin-bottom:1.75rem;
+    font-size:0.85rem;
+    font-weight:600;
+    color:var(--berry-deep);
+  }
+  .hero-title{
+    font-size:clamp(2.6rem, 8vw, 5.2rem);
+    line-height:0.98;
+    letter-spacing:-0.01em;
+  }
+  .hero-title em{
+    font-style:italic;
+    color:var(--berry);
+    display:block;
+  }
+  .hero-sub{
+    max-width:520px;
+    margin:1.5rem auto 2.5rem;
+    font-size:1.08rem;
+    line-height:1.6;
+    color:#5B3B4C;
+  }
+  #status-panel{
+    background:var(--paper);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:1.75rem 2rem;
+    display:inline-flex;
+    flex-direction:column;
+    align-items:center;
+    gap:0.75rem;
+    min-width:280px;
+  }
+  .countdown-row{
+    display:flex;
+    gap:1.2rem;
+  }
+  .countdown-unit{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-width:56px;
+  }
+  .countdown-num{
+    font-family:'Fraunces', serif;
+    font-size:2.1rem;
+    font-weight:600;
+    color:var(--berry-deep);
+    font-variant-numeric:tabular-nums;
+  }
+  .countdown-label{
+    font-size:0.65rem;
+    text-transform:uppercase;
+    letter-spacing:0.15em;
+    color:#8A6172;
+  }
+  .celebrate-headline{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-size:1.5rem;
+    color:var(--berry-deep);
+  }
+  .scroll-cue{
+    margin-top:3rem;
+    font-size:0.8rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:#8A6172;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:0.4rem;
+    animation:bob 2.2s ease-in-out infinite;
+  }
+  @keyframes bob{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(8px);}
+  }
+
+  /* ---------- SECTION HEADERS ---------- */
+  .section-head{
+    text-align:center;
+    margin-bottom:3rem;
+  }
+  .section-head h2{
+    font-size:clamp(1.9rem, 4vw, 2.6rem);
+    margin-top:0.5rem;
+  }
+  .section-head p{
+    color:#5B3B4C;
+    max-width:480px;
+    margin:0.9rem auto 0;
+  }
+
+  /* ---------- REP CARDS (love notes) ---------- */
+  #notes{
+    background:var(--paper);
+  }
+  .rep-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));
+    gap:1.3rem;
+  }
+  .rep-card{
+    perspective:1200px;
+    height:230px;
+    cursor:pointer;
+  }
+  .rep-card-inner{
+    position:relative;
+    width:100%;
+    height:100%;
+    transition:transform 0.65s cubic-bezier(.2,.8,.2,1);
+    transform-style:preserve-3d;
+  }
+  .rep-card.flipped .rep-card-inner{
+    transform:rotateY(180deg);
+  }
+  .rep-face{
+    position:absolute;
+    inset:0;
+    border-radius:18px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:1.4rem;
+    backface-visibility:hidden;
+    box-shadow:var(--shadow);
+  }
+  .rep-front{
+    background:linear-gradient(145deg, var(--ink), #4a2740);
+    color:var(--cream);
+  }
+  .rep-set{
+    font-size:0.7rem;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--lime);
+    font-weight:700;
+  }
+  .rep-icon{
+    font-size:2.4rem;
+  }
+  .rep-tap{
+    font-size:0.72rem;
+    opacity:0.65;
+  }
+  .rep-back{
+    background:linear-gradient(145deg, var(--berry), var(--coral));
+    color:#fff;
+    transform:rotateY(180deg);
+    justify-content:center;
+    text-align:center;
+    font-family:'Fraunces', serif;
+    font-size:1.05rem;
+    line-height:1.4;
+  }
+
+  /* ---------- GALLERY ---------- */
+  #gallery{
+    background:var(--cream);
+  }
+  .gallery-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+    gap:1rem;
+  }
+  .photo-frame{
+    aspect-ratio:4/5;
+    border-radius:18px;
+    background:linear-gradient(160deg, var(--gold), var(--coral));
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    box-shadow:var(--shadow);
+    font-size:0.85rem;
+    text-align:center;
+    padding:1rem;
+    transition:transform 0.3s ease;
+  }
+  .photo-frame:nth-child(2){ background:linear-gradient(160deg, var(--lime), #6EC6A3); }
+  .photo-frame:nth-child(3){ background:linear-gradient(160deg, var(--berry), var(--berry-deep)); }
+  .photo-frame:nth-child(4){ background:linear-gradient(160deg, #8FB8FF, var(--berry)); }
+  .photo-frame:hover{ transform:translateY(-6px) rotate(-1deg); }
+  .photo-frame .icon{ font-size:2.2rem; margin-bottom:0.5rem; }
+  .photo-frame small{ opacity:0.85; margin-top:0.35rem; }
+
+  /* ---------- WISH / CANDLE ---------- */
+  #wish{
+    text-align:center;
+    background:var(--paper);
+    border-radius:32px;
+    max-width:900px;
+    box-shadow:var(--shadow);
+  }
+  .cake-wrap{
+    display:flex;
+    justify-content:center;
+    margin:2.5rem 0 1.5rem;
+  }
+  .candle{
+    position:relative;
+    width:14px;
+    height:70px;
+    background:repeating-linear-gradient(45deg, var(--berry), var(--berry) 6px, #fff 6px, #fff 12px);
+    border-radius:4px;
+    cursor:pointer;
+  }
+  .flame{
+    position:absolute;
+    top:-26px;
+    left:50%;
+    transform:translateX(-50%);
+    width:16px;
+    height:26px;
+    background:radial-gradient(circle at 50% 70%, #FFEB99, var(--gold) 60%, var(--coral) 100%);
+    border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+    animation:flicker 1s ease-in-out infinite alternate;
+    transition:opacity 0.4s ease, transform 0.4s ease;
+  }
+  @keyframes flicker{
+    0%{ transform:translateX(-50%) scale(1) rotate(-2deg); }
+    100%{ transform:translateX(-50%) scale(1.08) rotate(2deg); }
+  }
+  .candle.blown .flame{
+    opacity:0;
+    transform:translateX(-50%) scale(0.4);
+  }
+  .wish-btn{
+    font-family:'Plus Jakarta Sans', sans-serif;
+    font-weight:700;
+    font-size:0.95rem;
+    background:var(--ink);
+    color:var(--cream);
+    border:none;
+    padding:0.9rem 1.8rem;
+    border-radius:999px;
+    cursor:pointer;
+    box-shadow:var(--shadow);
+    transition:transform 0.2s ease, background 0.2s ease;
+  }
+  .wish-btn:hover{ transform:translateY(-3px); background:var(--berry-deep); }
+  .wish-reveal{
+    margin-top:1.6rem;
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-size:1.2rem;
+    color:var(--berry-deep);
+    max-width:480px;
+    margin-left:auto;
+    margin-right:auto;
+    opacity:0;
+    transform:translateY(8px);
+    transition:opacity 0.6s ease, transform 0.6s ease;
+  }
+  .wish-reveal.show{ opacity:1; transform:translateY(0); }
+
+  /* ---------- FINAL LETTER ---------- */
+  #letter{
+    text-align:center;
+  }
+  .letter-card{
+    background:linear-gradient(165deg, var(--ink), #4a2740);
+    color:var(--cream);
+    border-radius:32px;
+    padding:3.2rem 2.2rem;
+    box-shadow:var(--shadow);
+  }
+  .letter-card p{
+    font-family:'Fraunces', serif;
+    font-size:1.25rem;
+    line-height:1.7;
+    max-width:560px;
+    margin:0 auto 1.5rem;
+  }
+  .signature{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    color:var(--gold);
+    font-size:1.3rem;
+  }
+
+  footer{
+    text-align:center;
+    padding:2.5rem 1.5rem 3rem;
+    font-size:0.8rem;
+    color:#8A6172;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ================= HERO ================= -->
+<section id="hero">
+  <div class="hero-badge">🎂 A little something from your favorite person</div>
+  <h1 class="hero-title">Happy Birthday<em>Twesha</em></h1>
+  <p class="hero-sub">Kind, gorgeous, ridiculously strong, and the owner of a smile that ends arguments before they start. Today is entirely about you.</p>
+
+  <div id="status-panel">
+    <!-- filled by JS: countdown OR celebration message -->
+  </div>
+
+  <div class="scroll-cue">
+    <span>scroll for your surprise</span>
+    <span>↓</span>
+  </div>
+</section>
+
+<!-- ================= LOVE NOTES ================= -->
+<section id="notes">
+  <div class="section-head">
+    <div class="eyebrow">Today's Set</div>
+    <h2>5 Reasons, 5 Reps</h2>
+    <p>Tap each card — like she taps out one more rep even when she's tired.</p>
+  </div>
+
+  <div class="rep-grid">
+    <!-- REP CARD CONTENT: edit rep-set / rep-icon / rep-back text for each card -->
+    <div class="rep-card">
+      <div class="rep-card-inner">
+        <div class="rep-face rep-front">
+          <div class="rep-set">Set 01</div>
+          <div class="rep-icon">💪</div>
+          <div class="rep-tap">tap to reveal</div>
+        </div>
+        <div class="rep-face rep-back">Placeholder: the way you show up for everyone, every single day.</div>
+      </div>
+    </div>
+
+    <div class="rep-card">
+      <div class="rep-card-inner">
+        <div class="rep-face rep-front">
+          <div class="rep-set">Set 02</div>
+          <div class="rep-icon">😄</div>
+          <div class="rep-tap">tap to reveal</div>
+        </div>
+        <div class="rep-face rep-back">Placeholder: that smile that makes a bad day instantly fixable.</div>
+      </div>
+    </div>
+
+    <div class="rep-card">
+      <div class="rep-card-inner">
+        <div class="rep-face rep-front">
+          <div class="rep-set">Set 03</div>
+          <div class="rep-icon">🏊‍♀️</div>
+          <div class="rep-tap">tap to reveal</div>
+        </div>
+        <div class="rep-face rep-back">Placeholder: your discipline — pilates, swimming, showing up even when you don't feel like it.</div>
+      </div>
+    </div>
+
+    <div class="rep-card">
+      <div class="rep-card-inner">
+        <div class="rep-face rep-front">
+          <div class="rep-set">Set 04</div>
+          <div class="rep-icon">🌸</div>
+          <div class="rep-tap">tap to reveal</div>
+        </div>
+        <div class="rep-face rep-back">Placeholder: how kind you are, even to people who never notice it.</div>
+      </div>
+    </div>
+
+    <div class="rep-card">
+      <div class="rep-card-inner">
+        <div class="rep-face rep-front">
+          <div class="rep-set">Set 05</div>
+          <div class="rep-icon">❤️</div>
+          <div class="rep-tap">tap to reveal</div>
+        </div>
+        <div class="rep-face rep-back">Placeholder: simply — you. Exactly as you are.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GALLERY ================= -->
+<section id="gallery">
+  <div class="section-head">
+    <div class="eyebrow">Our Story</div>
+    <h2>A Few of My Favorite Moments</h2>
+    <p>Placeholder frames for now — swap these for real photos any time.</p>
+  </div>
+  <div class="gallery-grid">
+    <!-- PHOTO PLACEHOLDER: replace each block's content with <img src="..." alt="..."> -->
+    <div class="photo-frame"><span class="icon">📸</span>Your favorite photo goes here<small>swap me</small></div>
+    <div class="photo-frame"><span class="icon">🥰</span>A candid you love<small>swap me</small></div>
+    <div class="photo-frame"><span class="icon">✈️</span>A trip together<small>swap me</small></div>
+    <div class="photo-frame"><span class="icon">🎉</span>A silly one<small>swap me</small></div>
+  </div>
+</section>
+
+<!-- ================= WISH ================= -->
+<section id="wish">
+  <div class="section-head" style="margin-bottom:0;">
+    <div class="eyebrow">Make a wish</div>
+    <h2>Blow out the candle</h2>
+  </div>
+  <div class="cake-wrap">
+    <div class="candle" id="candle">
+      <div class="flame" id="flame"></div>
+    </div>
+  </div>
+  <button class="wish-btn" id="wishBtn">Blow out & make a wish</button>
+  <div class="wish-reveal" id="wishReveal">Whatever you wished for — I hope I get to be part of it.</div>
+  <div style="height:2.5rem;"></div>
+</section>
+
+<!-- ================= FINAL LETTER ================= -->
+<section id="letter">
+  <div class="letter-card">
+    <!-- FINAL LETTER: edit this paragraph -->
+    <p>Twesha, another year of you is exactly what the world needed. Here's to more workouts you drag me to, more of that laugh I'll never get tired of, and more of everything, with you. Happy Birthday.</p>
+    <div class="signature">— always yours</div>
+  </div>
+</section>
+
+<footer>made with love, hosted just for you 💌</footer>
+
+<script>
+(function(){
+  // ---------- BIRTHDAY TARGET ----------
+  // July 14, 2026, 00:00 IST (UTC+5:30) === 2026-07-13T18:30:00Z
+  var target = new Date("2026-07-13T18:30:00Z");
+  var panel = document.getElementById('status-panel');
+
+  function renderCountdown(){
+    var now = new Date();
+    var diff = target - now;
+    if(diff <= 0){
+      renderCelebration();
+      return;
+    }
+    var d = Math.floor(diff / (1000*60*60*24));
+    var h = Math.floor((diff / (1000*60*60)) % 24);
+    var m = Math.floor((diff / (1000*60)) % 60);
+    var s = Math.floor((diff / 1000) % 60);
+    panel.innerHTML =
+      '<div class="eyebrow">Countdown to her day</div>' +
+      '<div class="countdown-row">' +
+        unit(d,'days') + unit(h,'hrs') + unit(m,'min') + unit(s,'sec') +
+      '</div>';
+  }
+  function unit(val,label){
+    return '<div class="countdown-unit"><div class="countdown-num">'+String(val).padStart(2,'0')+'</div><div class="countdown-label">'+label+'</div></div>';
+  }
+
+  var celebrated = false;
+  function renderCelebration(){
+    panel.innerHTML =
+      '<div class="eyebrow">It\'s official</div>' +
+      '<div class="celebrate-headline">Her birthday is here 🎉</div>';
+    if(!celebrated){
+      celebrated = true;
+      burstConfetti(160);
+    }
+  }
+
+  var timer = setInterval(function(){
+    renderCountdown();
+    if(new Date() >= target){ clearInterval(timer); }
+  }, 1000);
+  renderCountdown();
+
+  // ---------- FLIP CARDS ----------
+  document.querySelectorAll('.rep-card').forEach(function(card){
+    card.addEventListener('click', function(){
+      card.classList.toggle('flipped');
+    });
+  });
+
+  // ---------- CANDLE ----------
+  var candle = document.getElementById('candle');
+  var wishBtn = document.getElementById('wishBtn');
+  var wishReveal = document.getElementById('wishReveal');
+  function blowOut(){
+    if(candle.classList.contains('blown')) return;
+    candle.classList.add('blown');
+    wishReveal.classList.add('show');
+    burstConfetti(90);
+  }
+  candle.addEventListener('click', blowOut);
+  wishBtn.addEventListener('click', blowOut);
+
+  // ---------- CONFETTI ----------
+  var canvas = document.getElementById('confetti-canvas');
+  var ctx = canvas.getContext('2d');
+  function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  window.addEventListener('resize', resize);
+  resize();
+
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var particles = [];
+  var colors = ['#D6336C','#FF7A59','#FFC94D','#B7E38A','#341C2B'];
+
+  function burstConfetti(count){
+    if(reduceMotion) return;
+    for(var i=0;i<count;i++){
+      particles.push({
+        x: canvas.width/2 + (Math.random()-0.5)*canvas.width*0.6,
+        y: canvas.height*0.3 + (Math.random()-0.5)*100,
+        vx: (Math.random()-0.5)*8,
+        vy: Math.random()*-8 - 2,
+        size: Math.random()*7+4,
+        color: colors[Math.floor(Math.random()*colors.length)],
+        rot: Math.random()*360,
+        vr: (Math.random()-0.5)*10,
+        life: 0
+      });
+    }
+    if(!animating){ animating = true; animate(); }
+  }
+
+  var animating = false;
+  function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(function(p){
+      p.vy += 0.18;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+      p.life++;
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.6);
+      ctx.restore();
+    });
+    particles = particles.filter(function(p){ return p.y < canvas.height + 40 && p.life < 400; });
+    if(particles.length > 0){
+      requestAnimationFrame(animate);
+    } else {
+      animating = false;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+    }
+  }
+})();
+</script>
+
+</body>
+</html>
