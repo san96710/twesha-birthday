@@ -3,22 +3,22 @@
   ============================================================
   TWESHA'S BIRTHDAY SURPRISE — quick customization guide
   ============================================================
-  1. PHOTOS: search "PHOTO PLACEHOLDER" — replace each
-     <div class="photo-frame">...</div> with an <img> tag.
+  1. PHOTOS: search "PHOTOS:" in the gallery section — drop
+     image1.jpg, image2.png, image3.png, image4.png and
+     image5.png in this same folder, or edit the filenames
+     in the <img src="..."> tags to match whatever you have.
 
-  2. LOVE NOTES: search "REP CARD CONTENT" — 5 flip cards.
-
-  3. CAKE CUT MESSAGE: search "cake-slice-msg" for the text
+  2. CAKE CUT MESSAGE: search "cake-slice-msg" for the text
      shown when she successfully cuts a slice.
 
-  4. FINAL LETTER: search "FINAL LETTER" near the bottom.
+  3. FINAL LETTER: search "FINAL LETTER" near the bottom.
 
-  5. BIRTHDAY DATE: search "BIRTHDAY TARGET" in the script.
+  4. BIRTHDAY DATE: search "BIRTHDAY TARGET" in the script.
 
-  6. SHAKE SECRET: search "shakeSecretMsg" — edit the hidden
+  5. SHAKE SECRET: search "shakeSecretMsg" — edit the hidden
      note revealed by shaking the phone.
 
-  7. BACKGROUND SONG: drop an audio file named exactly
+  6. BACKGROUND SONG: drop an audio file named exactly
      "background-song.mp3" (or .m4a) next to this index.html.
      It'll loop automatically from the moment she opens the
      surprise. No YouTube link can be embedded as an invisible
@@ -446,32 +446,6 @@
   .section-head h2{ font-size:clamp(1.9rem, 4vw, 2.6rem); margin-top:0.5rem; }
   .section-head p{ color:#5B3B4C; max-width:480px; margin:0.9rem auto 0; }
 
-  /* ---------- REP CARDS ---------- */
-  #notes{ background:var(--paper); }
-  .rep-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:1.3rem; }
-  .rep-card{ perspective:1200px; height:230px; cursor:pointer; }
-  .rep-card-inner{
-    position:relative; width:100%; height:100%;
-    transition:transform 0.65s cubic-bezier(.2,.8,.2,1);
-    transform-style:preserve-3d;
-  }
-  .rep-card.flipped .rep-card-inner{ transform:rotateY(180deg); }
-  .rep-face{
-    position:absolute; inset:0; border-radius:18px;
-    display:flex; flex-direction:column; justify-content:space-between;
-    padding:1.4rem; backface-visibility:hidden; box-shadow:var(--shadow);
-  }
-  .rep-front{ background:linear-gradient(145deg, var(--ink), #4a2740); color:var(--cream); }
-  .rep-set{ font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--lime); font-weight:700; }
-  .rep-icon{ font-size:2.4rem; transition:transform 0.3s ease; }
-  .rep-card:hover .rep-icon{ transform:scale(1.15) rotate(-6deg); }
-  .rep-tap{ font-size:0.72rem; opacity:0.65; }
-  .rep-back{
-    background:linear-gradient(145deg, var(--berry), var(--coral)); color:#fff;
-    transform:rotateY(180deg); justify-content:center; text-align:center;
-    font-family:'Fraunces', serif; font-size:1.05rem; line-height:1.4;
-  }
-
   /* ---------- GALLERY ---------- */
   #gallery{ background:var(--cream); }
   .gallery-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; }
@@ -482,9 +456,11 @@
     color:#fff; box-shadow:var(--shadow); font-size:0.85rem; text-align:center;
     padding:1rem; transition:transform 0.4s cubic-bezier(.2,.8,.2,1);
   }
+  img.photo-frame{ padding:0; object-fit:cover; width:100%; }
   .photo-frame:nth-child(2){ background:linear-gradient(160deg, var(--lime), #6EC6A3); }
   .photo-frame:nth-child(3){ background:linear-gradient(160deg, var(--berry), var(--berry-deep)); }
   .photo-frame:nth-child(4){ background:linear-gradient(160deg, #8FB8FF, var(--berry)); }
+  .photo-frame:nth-child(5){ background:linear-gradient(160deg, var(--gold), var(--berry-deep)); }
   .photo-frame:hover{ transform:translateY(-8px) rotate(-1.5deg) scale(1.02); }
   .photo-frame .icon{ font-size:2.2rem; margin-bottom:0.5rem; }
   .photo-frame small{ opacity:0.85; margin-top:0.35rem; }
@@ -862,6 +838,8 @@
     <p>One flame goes out. The other stays lit — always. Then slice yourself a piece.</p>
   </div>
 
+  <div class="cake-cut-hint" id="cakeCutHint">Now drag on the cake: start at one edge, through the middle, out to another edge 🔪</div>
+
   <div class="cake-scene reveal">
     <div class="cake-candles-wrap">
       <div class="candle" id="candle"><div class="flame" id="flame"></div></div>
@@ -886,7 +864,6 @@
   <div class="mic-status" id="micStatus"></div>
   <div class="wish-reveal" id="wishReveal">Whatever you wished for — I hope I get to be part of it.</div>
   <button class="quiz-restart candle-replay-btn" id="candleReplayBtn">Light it again</button>
-  <div class="cake-cut-hint" id="cakeCutHint">Now drag on the cake: start at one edge, through the middle, out to another edge 🔪</div>
 </section>
 
 <!-- ================= COMPLIMENT GENERATOR ================= -->
@@ -902,86 +879,20 @@
   </div>
 </section>
 
-<!-- ================= LOVE NOTES ================= -->
-<section id="notes" class="slide">
-  <div class="section-head reveal">
-    <div class="eyebrow">Today's Set</div>
-    <h2>5 Reasons, 5 Reps</h2>
-    <p>Tap each card — like she taps out one more rep even when she's tired.</p>
-  </div>
-
-  <div class="rep-grid reveal-stagger reveal">
-    <!-- REP CARD CONTENT: edit rep-set / rep-icon / rep-back text for each card -->
-    <div class="rep-card stagger-item">
-      <div class="rep-card-inner">
-        <div class="rep-face rep-front">
-          <div class="rep-set">Set 01</div>
-          <div class="rep-icon">💪</div>
-          <div class="rep-tap">tap to reveal</div>
-        </div>
-        <div class="rep-face rep-back">Placeholder: the way you show up for everyone, every single day.</div>
-      </div>
-    </div>
-
-    <div class="rep-card stagger-item">
-      <div class="rep-card-inner">
-        <div class="rep-face rep-front">
-          <div class="rep-set">Set 02</div>
-          <div class="rep-icon">😄</div>
-          <div class="rep-tap">tap to reveal</div>
-        </div>
-        <div class="rep-face rep-back">Placeholder: that smile that makes a bad day instantly fixable.</div>
-      </div>
-    </div>
-
-    <div class="rep-card stagger-item">
-      <div class="rep-card-inner">
-        <div class="rep-face rep-front">
-          <div class="rep-set">Set 03</div>
-          <div class="rep-icon">🏊‍♀️</div>
-          <div class="rep-tap">tap to reveal</div>
-        </div>
-        <div class="rep-face rep-back">Placeholder: your discipline — pilates, swimming, showing up even when you don't feel like it.</div>
-      </div>
-    </div>
-
-    <div class="rep-card stagger-item">
-      <div class="rep-card-inner">
-        <div class="rep-face rep-front">
-          <div class="rep-set">Set 04</div>
-          <div class="rep-icon">🌸</div>
-          <div class="rep-tap">tap to reveal</div>
-        </div>
-        <div class="rep-face rep-back">Placeholder: how kind you are, even to people who never notice it.</div>
-      </div>
-    </div>
-
-    <div class="rep-card stagger-item">
-      <div class="rep-card-inner">
-        <div class="rep-face rep-front">
-          <div class="rep-set">Set 05</div>
-          <div class="rep-icon">❤️</div>
-          <div class="rep-tap">tap to reveal</div>
-        </div>
-        <div class="rep-face rep-back">Placeholder: simply — you. Exactly as you are.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- ================= GALLERY ================= -->
 <section id="gallery" class="slide">
   <div class="section-head reveal">
     <div class="eyebrow">Our Story</div>
     <h2>A Few of My Favorite Moments</h2>
-    <p>Placeholder frames for now — swap these for real photos any time.</p>
+    <p>A few of the ones I love most.</p>
   </div>
   <div class="gallery-grid reveal-stagger reveal">
-    <!-- PHOTO PLACEHOLDER: replace each block's content with <img src="..." alt="..."> -->
-    <div class="photo-frame stagger-item"><span class="icon">📸</span>Your favorite photo goes here<small>swap me</small></div>
-    <div class="photo-frame stagger-item"><span class="icon">🥰</span>A candid you love<small>swap me</small></div>
-    <div class="photo-frame stagger-item"><span class="icon">✈️</span>A trip together<small>swap me</small></div>
-    <div class="photo-frame stagger-item"><span class="icon">🎉</span>A silly one<small>swap me</small></div>
+    <!-- PHOTOS: swap these filenames for whatever you name your images -->
+    <img class="photo-frame stagger-item" src="image1.jpg" alt="A favorite memory">
+    <img class="photo-frame stagger-item" src="image2.png" alt="A favorite memory">
+    <img class="photo-frame stagger-item" src="image3.png" alt="A favorite memory">
+    <img class="photo-frame stagger-item" src="image4.png" alt="A favorite memory">
+    <img class="photo-frame stagger-item" src="image5.png" alt="A favorite memory">
   </div>
 </section>
 
@@ -1039,7 +950,7 @@
       <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="codeInput" placeholder="••••">
       <div><button class="code-submit-btn" id="codeSubmitBtn">Unlock</button></div>
       <div class="code-error" id="codeError"></div>
-      <div class="code-hint">Hint: our two birthdays, MMDD.</div>
+      <div class="code-hint">Hint: our two birthdays.</div>
     </div>
     <div class="code-unlocked-content" id="codeUnlockedContent" style="display:none;">
       <!-- FINAL LETTER: edit this paragraph -->
@@ -1358,6 +1269,8 @@
   var nextSlideBtn = document.getElementById('nextSlideBtn');
   var slideDotsWrap = document.getElementById('slideDots');
   var slideIndex = 0;
+  var cakeSlideIndex = slides.findIndex(function(s){ return s.id === 'cake'; });
+  var cakeNagTimer = null;
 
   slides.forEach(function(_, i){
     var dot = document.createElement('button');
@@ -1373,8 +1286,30 @@
     slide.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('visible'); });
   }
 
+  function nagAboutCake(){
+    var hint = document.getElementById('cakeCutHint');
+    var candleEl = document.getElementById('candle');
+    var wasShown = hint.classList.contains('show');
+    var wasError = hint.classList.contains('error');
+    var prevText = hint.textContent;
+    hint.classList.add('show', 'error');
+    hint.textContent = candleEl.classList.contains('blown')
+      ? "Cut yourself a slice first! 🍰"
+      : "Blow out the candle, then cut a slice, before moving on! 🕯️🍰";
+    clearTimeout(cakeNagTimer);
+    cakeNagTimer = setTimeout(function(){
+      hint.textContent = prevText;
+      hint.classList.toggle('error', wasError);
+      hint.classList.toggle('show', wasShown);
+    }, 2000);
+  }
+
   function goToSlide(i){
     if(i < 0 || i >= slides.length) return;
+    if(i > cakeSlideIndex && !sliceCut){
+      i = cakeSlideIndex;
+      nagAboutCake();
+    }
     slides[slideIndex].classList.remove('active');
     slideIndex = i;
     var target = slides[slideIndex];
@@ -1383,7 +1318,7 @@
     revealSlideContent(target);
     slideDotEls.forEach(function(d, idx){ d.classList.toggle('active', idx === slideIndex); });
     prevSlideBtn.disabled = slideIndex === 0;
-    nextSlideBtn.disabled = slideIndex === slides.length - 1;
+    nextSlideBtn.disabled = slideIndex === slides.length - 1 || (slideIndex === cakeSlideIndex && !sliceCut);
   }
 
   function startSlides(){
@@ -1421,11 +1356,6 @@
       if(dx < 0){ goToSlide(slideIndex + 1); } else { goToSlide(slideIndex - 1); }
     }
   }, { passive:true });
-
-  /* ================= FLIP CARDS ================= */
-  document.querySelectorAll('.rep-card').forEach(function(card){
-    card.addEventListener('click', function(){ card.classList.toggle('flipped'); });
-  });
 
   /* ================= CANDLE ================= */
   var candle = document.getElementById('candle');
@@ -1537,6 +1467,7 @@
     cakeCutHint.classList.remove('show', 'error');
     cakeCutHint.textContent = 'Now drag on the cake: start at one edge, through the middle, out to another edge 🔪';
     cakeSlicePopup.classList.remove('show');
+    if(slideIndex === cakeSlideIndex){ nextSlideBtn.disabled = true; }
   }
 
   cakeSvg.addEventListener('pointerdown', function(e){
@@ -1557,6 +1488,7 @@
     cutTrail.setAttribute('points', '');
     if(result){
       sliceCut = true;
+      nextSlideBtn.disabled = false;
       drawWedgeMark(result.startAngle, result.endAngle);
       cakeCutHint.classList.remove('show');
       vibrate([20, 40, 20]);
