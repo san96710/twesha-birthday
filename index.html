@@ -482,14 +482,15 @@
     padding:0.7rem 1rem; font-weight:700; font-size:0.85rem; color:var(--berry-deep);
   }
   .falling-heart{
-    position:absolute; top:-44px;
-    width:48px; height:48px;
+    position:absolute; top:-40px;
+    width:40px; height:40px;
     display:flex; align-items:center; justify-content:center;
-    font-size:1.8rem; line-height:1;
+    font-size:1.6rem; line-height:1;
     cursor:pointer; user-select:none; animation:fall linear forwards;
     touch-action:manipulation; -webkit-tap-highlight-color:transparent;
   }
   @keyframes fall{ from{ transform:translateY(0); } to{ transform:translateY(380px); } }
+  .falling-heart.decoy{ filter:grayscale(0.35) brightness(0.9); }
   .game-start-btn{
     position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:3;
     font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:0.9rem;
@@ -530,6 +531,16 @@
   .mic-btn:hover{ transform:translateY(-2px); background:var(--berry-deep); }
   .mic-btn:disabled{ opacity:0.6; cursor:default; transform:none; }
   .mic-status{ margin-top:0.6rem; font-size:0.85rem; color:#5B3B4C; min-height:1.2em; }
+
+  .blow-meter{
+    width:180px; height:8px; margin:0 auto 1.1rem;
+    background:rgba(214,51,108,0.15); border-radius:999px; overflow:hidden;
+  }
+  .blow-meter-fill{
+    height:100%; width:0%;
+    background:linear-gradient(90deg, var(--berry), var(--coral));
+    transition:width 0.08s linear;
+  }
 
   /* ---------- WISH / CANDLE ---------- */
   #wish{
@@ -740,7 +751,7 @@
     <!-- GAME 1: Catch the Hearts -->
     <div class="game-card stagger-item">
       <h3>Catch the Hearts 💕</h3>
-      <p class="game-desc">15 seconds. Tap as many hearts as you can before time runs out.</p>
+      <p class="game-desc">15 seconds, fast hearts. Tap the pink ones, avoid the broken 💔 ones (they cost you).</p>
       <div class="heart-arena" id="heartArena">
         <div class="game-hud">
           <span id="heartScore">Score: 0</span>
@@ -763,6 +774,7 @@
       <div class="shake-box">
         <div class="shake-icon" id="shakeIcon">🤫</div>
         <button class="mic-btn" id="shakeEnableBtn">Enable & shake</button>
+        <div class="mic-status" id="shakeStatus"></div>
         <!-- SHAKE SECRET: edit this hidden message -->
         <div class="shake-secret-msg" id="shakeSecretMsg">Placeholder: here's a secret I've never told you...</div>
       </div>
@@ -781,6 +793,7 @@
       <div class="flame" id="flame"></div>
     </div>
   </div>
+  <div class="blow-meter" id="blowMeter"><div class="blow-meter-fill" id="blowMeterFill"></div></div>
   <button class="mic-btn reveal" id="micBtn">🎤 Blow into your mic</button>
   <div class="mic-status" id="micStatus"></div>
   <div class="wish-reveal" id="wishReveal">Whatever you wished for — I hope I get to be part of it.</div>
@@ -800,6 +813,13 @@
 
 <script>
 (function(){
+
+  /* ================= RESET ON EVERY (RE)LAUNCH ================= */
+  if('scrollRestoration' in history){ history.scrollRestoration = 'manual'; }
+  window.scrollTo(0, 0);
+  window.addEventListener('pageshow', function(e){
+    if(e.persisted){ window.location.reload(); }
+  });
 
   /* ================= INTRO SEQUENCE ================= */
   var introLines = document.querySelectorAll('.intro-line');
@@ -1043,10 +1063,15 @@
 
   /* ================= CANDLE ================= */
   var candle = document.getElementById('candle');
+  var flame = document.getElementById('flame');
   var wishReveal = document.getElementById('wishReveal');
+  var blowMeterFill = document.getElementById('blowMeterFill');
   function blowOut(){
     if(candle.classList.contains('blown')) return;
     candle.classList.add('blown');
+    flame.style.opacity = '';
+    flame.style.animationDuration = '';
+    blowMeterFill.style.width = '0%';
     wishReveal.classList.add('show');
     burstConfetti(90);
   }
@@ -1081,15 +1106,15 @@
       analyser.fftSize = 512;
       source.connect(analyser);
       var data = new Uint8Array(analyser.frequencyBinCount);
-      var loudFrames = 0;
-      var REQUIRED_FRAMES = 8;
-      var THRESHOLD = 42;
+      var THRESHOLD = 55;
+      var blowStrength = 0;
       var stopped = false;
 
       function cleanup(){
         stopped = true;
         stopMicStream();
         audioCtx.close();
+        blowMeterFill.style.width = '0%';
       }
 
       function checkVolume(){
@@ -1103,15 +1128,22 @@
         }
         var rms = Math.sqrt(sum/data.length);
         if(rms > THRESHOLD){
-          loudFrames++;
-          if(loudFrames >= REQUIRED_FRAMES){
-            micStatus.textContent = 'Nice blow! 🎉';
-            blowOut();
-            cleanup();
-            return;
-          }
+          blowStrength = Math.min(1, blowStrength + 0.035);
         } else {
-          loudFrames = Math.max(0, loudFrames - 1);
+          blowStrength = Math.max(0, blowStrength - 0.05);
+        }
+        blowMeterFill.style.width = (blowStrength*100) + '%';
+        flame.style.opacity = String(1 - blowStrength*0.75);
+        flame.style.animationDuration = (1 - blowStrength*0.6) + 's';
+        if(blowStrength >= 1){
+          micStatus.textContent = 'Nice blow! 🎉';
+          blowOut();
+          cleanup();
+          return;
+        } else if(blowStrength > 0.15){
+          micStatus.textContent = 'Keep blowing... 🎤';
+        } else {
+          micStatus.textContent = 'Listening... blow toward your phone 🎤';
         }
         requestAnimationFrame(checkVolume);
       }
@@ -1126,10 +1158,14 @@
   var shakeEnableBtn = document.getElementById('shakeEnableBtn');
   var shakeIcon = document.getElementById('shakeIcon');
   var shakeSecretMsg = document.getElementById('shakeSecretMsg');
+  var shakeStatus = document.getElementById('shakeStatus');
   var shakeUnlocked = false;
   var lastShakeCheck = 0;
   var lastX, lastY, lastZ;
-  var SHAKE_THRESHOLD = 18;
+  var SHAKE_THRESHOLD = 32;
+  var REQUIRED_SHAKES = 6;
+  var SHAKE_WINDOW = 1300;
+  var shakeHits = [];
 
   function handleMotion(e){
     var acc = e.accelerationIncludingGravity || e.acceleration;
@@ -1141,10 +1177,17 @@
     var delta = Math.abs(acc.x - lastX) + Math.abs(acc.y - lastY) + Math.abs(acc.z - lastZ);
     lastX = acc.x; lastY = acc.y; lastZ = acc.z;
     if(delta > SHAKE_THRESHOLD && !shakeUnlocked){
-      shakeUnlocked = true;
-      shakeIcon.textContent = '💌';
-      shakeSecretMsg.classList.add('show');
-      burstConfetti(60);
+      shakeHits.push(now);
+      shakeHits = shakeHits.filter(function(ts){ return now - ts <= SHAKE_WINDOW; });
+      if(shakeHits.length >= REQUIRED_SHAKES){
+        shakeUnlocked = true;
+        shakeIcon.textContent = '💌';
+        shakeStatus.textContent = '';
+        shakeSecretMsg.classList.add('show');
+        burstConfetti(60);
+      } else {
+        shakeStatus.textContent = 'Keep shaking... ' + shakeHits.length + '/' + REQUIRED_SHAKES;
+      }
     }
   }
 
@@ -1185,20 +1228,27 @@
   var heartTimeLeft = 15;
   var heartSpawnTimer, heartCountdownTimer;
   var heartEmojis = ['💕','💖','💗','❤️','💓'];
+  var DECOY_EMOJI = '💔';
+  var DECOY_CHANCE = 0.25;
 
   function spawnFallingHeart(){
     var el = document.createElement('div');
-    el.className = 'falling-heart';
-    el.textContent = heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
+    var isDecoy = Math.random() < DECOY_CHANCE;
+    el.className = 'falling-heart' + (isDecoy ? ' decoy' : '');
+    el.textContent = isDecoy ? DECOY_EMOJI : heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
     var arenaWidth = heartArena.clientWidth;
-    el.style.left = (Math.random() * Math.max(arenaWidth - 48, 0)) + 'px';
-    el.style.animationDuration = (2 + Math.random()*1.5) + 's';
+    el.style.left = (Math.random() * Math.max(arenaWidth - 40, 0)) + 'px';
+    el.style.animationDuration = (1.1 + Math.random()*0.9) + 's';
     var caught = false;
     el.addEventListener('pointerdown', function(e){
       if(!heartGameRunning || caught) return;
       caught = true;
       e.preventDefault();
-      heartScore++;
+      if(isDecoy){
+        heartScore = Math.max(0, heartScore - 2);
+      } else {
+        heartScore++;
+      }
       heartScoreEl.textContent = 'Score: ' + heartScore;
       el.remove();
     });
@@ -1214,7 +1264,7 @@
     heartTimerEl.textContent = heartTimeLeft + 's';
     heartOverPanel.classList.remove('show');
     heartStartBtn.style.display = 'none';
-    heartSpawnTimer = setInterval(spawnFallingHeart, 550);
+    heartSpawnTimer = setInterval(spawnFallingHeart, 420);
     heartCountdownTimer = setInterval(function(){
       heartTimeLeft--;
       heartTimerEl.textContent = heartTimeLeft + 's';
@@ -1228,8 +1278,8 @@
     clearInterval(heartCountdownTimer);
     heartArena.querySelectorAll('.falling-heart').forEach(function(h){ h.remove(); });
     heartFinalScoreEl.textContent = heartScore;
-    if(heartScore >= 15){ heartResultMsgEl.textContent = 'Okay champion, that was impressive.'; burstConfetti(80); }
-    else if(heartScore >= 8){ heartResultMsgEl.textContent = "Solid — you've got quick hands."; }
+    if(heartScore >= 12){ heartResultMsgEl.textContent = 'Okay champion, that was impressive.'; burstConfetti(80); }
+    else if(heartScore >= 6){ heartResultMsgEl.textContent = "Solid — you've got quick hands."; }
     else { heartResultMsgEl.textContent = "We'll call that a warm-up round."; }
     heartOverPanel.classList.add('show');
   }
