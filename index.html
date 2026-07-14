@@ -8,9 +8,8 @@
 
   2. LOVE NOTES: search "REP CARD CONTENT" — 5 flip cards.
 
-  3. QUIZ: search "QUIZ QUESTIONS" in the <script> — it's a
-     JS array. Edit question / options / correctIndex for
-     each. Add or remove objects from the array freely.
+  3. CAKE CUT MESSAGE: search "cake-slice-msg" for the text
+     shown when she successfully cuts a slice.
 
   4. FINAL LETTER: search "FINAL LETTER" near the bottom.
 
@@ -18,6 +17,14 @@
 
   6. SHAKE SECRET: search "shakeSecretMsg" — edit the hidden
      note revealed by shaking the phone.
+
+  7. BACKGROUND SONG: drop an audio file named exactly
+     "background-song.mp3" (or .m4a) next to this index.html.
+     It'll loop automatically from the moment she opens the
+     surprise. No YouTube link can be embedded as an invisible
+     always-on track — export the audio from wherever you like
+     and use that file instead. Search "bgSong" to change the
+     expected filename.
 
   NOTE ON PHONE SENSORS (mic blow + shake-to-reveal): iOS only
   grants microphone/motion access on a "secure context" — that
@@ -288,6 +295,38 @@
   }
   .music-toggle:hover{ transform:scale(1.08); }
   .music-toggle.playing{ animation:pulse-glow 1.6s ease-in-out infinite; }
+  .song-toggle{ right:4.3rem; }
+
+  /* ---------- HEARTBEAT HOLD ---------- */
+  .heartbeat-heart{
+    font-size:2.2rem; cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent;
+    display:inline-block; transition:transform 0.15s ease; margin-top:1.2rem;
+  }
+  .heartbeat-heart.growing{ animation:heartbeat-pulse 0.5s ease-in-out infinite; }
+  @keyframes heartbeat-pulse{
+    0%,100%{ transform:scale(1); }
+    50%{ transform:scale(1.18); }
+  }
+  .heartbeat-hint{ font-size:0.75rem; color:#8A6172; margin-top:0.3rem; }
+  .heartbeat-overlay{
+    position:fixed; inset:0; z-index:1900;
+    display:none; align-items:center; justify-content:center; flex-direction:column;
+    background:linear-gradient(165deg, var(--ink), #4a2740);
+    text-align:center; padding:2rem;
+  }
+  .heartbeat-overlay.show{ display:flex; }
+  .heartbeat-overlay .big-heart{
+    font-size:5rem; animation:heartbeat-pulse 0.9s ease-in-out infinite;
+  }
+  .heartbeat-overlay p{
+    font-family:'Fraunces', serif; font-style:italic; color:var(--cream); font-size:1.3rem;
+    max-width:420px; margin:1.2rem 0 1.6rem;
+  }
+  .heartbeat-close-btn{
+    font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:0.9rem;
+    background:var(--gold); color:var(--ink); border:none;
+    padding:0.75rem 1.6rem; border-radius:999px; cursor:pointer;
+  }
 
   /* ---------- HERO ---------- */
   #hero{
@@ -639,8 +678,8 @@
     transition:width 0.08s linear;
   }
 
-  /* ---------- WISH / CANDLE ---------- */
-  #wish{
+  /* ---------- CAKE + CANDLES + CUT ---------- */
+  #cake{
     text-align:center;
     background:var(--paper);
     border-radius:32px;
@@ -676,6 +715,64 @@
   .candle-replay-btn{ display:none; margin-top:1.4rem; }
   .wish-reveal.show ~ .candle-replay-btn{ display:inline-block; }
 
+  /* ---- cake + cutting scene ---- */
+  .cake-scene{
+    position:relative; width:100%; max-width:300px; margin:1.5rem auto 0.5rem;
+  }
+  .cake-candles-wrap{
+    position:absolute; top:6%; left:0; width:100%; display:flex; justify-content:center; gap:2.2rem;
+    z-index:3; pointer-events:none;
+  }
+  .cake-candles-wrap .candle{ pointer-events:auto; transform:scale(0.85); }
+  .candle-eternal{ pointer-events:none; }
+  .candle-eternal .flame{
+    box-shadow:0 0 14px 4px rgba(255,201,77,0.55);
+  }
+  .cake-svg{
+    width:100%; height:auto; display:block; touch-action:none; user-select:none;
+    filter:drop-shadow(0 14px 18px rgba(52,28,43,0.25));
+  }
+  .cake-cut-hint{
+    margin-top:0.9rem; font-size:0.85rem; color:#8A6172;
+    opacity:0; transition:opacity 0.5s ease; min-height:1.3em;
+  }
+  .cake-cut-hint.show{ opacity:1; }
+  .cake-cut-hint.error{ color:var(--coral); font-weight:700; }
+
+  .cake-slice-popup{
+    position:fixed; inset:0; z-index:1800;
+    display:none; align-items:center; justify-content:center;
+    background:rgba(52,28,43,0.55);
+    padding:1.5rem;
+  }
+  .cake-slice-popup.show{ display:flex; }
+  .cake-slice-popup-card{
+    background:var(--paper); border-radius:28px; box-shadow:var(--shadow);
+    padding:2.2rem 2rem; text-align:center; max-width:340px;
+    animation:slice-pop 0.5s cubic-bezier(.2,.8,.2,1) both;
+  }
+  @keyframes slice-pop{
+    0%{ opacity:0; transform:translateY(40px) scale(0.7) rotate(-8deg); }
+    70%{ opacity:1; transform:translateY(-6px) scale(1.05) rotate(2deg); }
+    100%{ opacity:1; transform:translateY(0) scale(1) rotate(0deg); }
+  }
+  .cake-slice-visual{
+    width:90px; height:78px; margin:0 auto 1.2rem;
+    clip-path:polygon(50% 0%, 5% 100%, 95% 100%);
+    background:
+      linear-gradient(180deg, #FFF3ED 0%, #FFF3ED 18%, var(--coral) 18%, var(--coral) 55%, var(--gold) 55%, var(--gold) 100%);
+    box-shadow:0 8px 16px -6px rgba(52,28,43,0.4);
+  }
+  .cake-slice-msg{
+    font-family:'Fraunces', serif; font-style:italic; font-size:1.15rem; color:var(--berry-deep);
+    margin-bottom:1.2rem;
+  }
+  .cake-slice-close-btn{
+    font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:0.9rem;
+    background:var(--ink); color:var(--cream); border:none;
+    padding:0.75rem 1.6rem; border-radius:999px; cursor:pointer;
+  }
+
   /* ---------- FINAL LETTER ---------- */
   #letter{ text-align:center; z-index:2; }
   .letter-card{
@@ -702,6 +799,26 @@
 <canvas id="confetti-canvas"></canvas>
 
 <button class="music-toggle" id="musicToggle" title="Play the happy birthday tune">🎵</button>
+<button class="music-toggle song-toggle" id="songToggle" title="Play/pause the background song">🎶</button>
+<!-- BACKGROUND SONG: drop a file named background-song.mp3 (or .m4a) next to this HTML file -->
+<audio id="bgSong" loop preload="none">
+  <source src="background-song.mp3" type="audio/mpeg">
+  <source src="background-song.m4a" type="audio/mp4">
+</audio>
+
+<div class="heartbeat-overlay" id="heartbeatOverlay">
+  <div class="big-heart">❤️</div>
+  <p id="heartbeatMsg">Every beat of this is for you.</p>
+  <button class="heartbeat-close-btn" id="heartbeatCloseBtn">Close</button>
+</div>
+
+<div class="cake-slice-popup" id="cakeSlicePopup">
+  <div class="cake-slice-popup-card">
+    <div class="cake-slice-visual"></div>
+    <div class="cake-slice-msg">A slice, just for you 🍰❤️</div>
+    <button class="cake-slice-close-btn" id="cakeSliceCloseBtn">Enjoy 🍴</button>
+  </div>
+</div>
 
 <div class="slide-nav" id="slideNav" style="display:none;">
   <button class="slide-nav-btn" id="prevSlideBtn" aria-label="Previous">‹</button>
@@ -728,10 +845,48 @@
 
   <div id="status-panel" class="reveal"></div>
 
+  <div class="heartbeat-heart reveal" id="heartbeatHeart">❤️</div>
+  <div class="heartbeat-hint reveal">press and hold</div>
+
   <button class="scroll-cue reveal" id="heroNextBtn" type="button">
     <span>tap for your surprise</span>
     <span>↓</span>
   </button>
+</section>
+
+<!-- ================= CAKE + CANDLES + CUT ================= -->
+<section id="cake" class="slide">
+  <div class="section-head reveal" style="margin-bottom:1.2rem;">
+    <div class="eyebrow">Make a wish</div>
+    <h2>Blow out a candle, then cut the cake</h2>
+    <p>One flame goes out. The other stays lit — always. Then slice yourself a piece.</p>
+  </div>
+
+  <div class="cake-scene reveal">
+    <div class="cake-candles-wrap">
+      <div class="candle" id="candle"><div class="flame" id="flame"></div></div>
+      <div class="candle candle-eternal" id="eternalCandle"><div class="flame" id="eternalFlame"></div></div>
+    </div>
+    <svg class="cake-svg" id="cakeSvg" data-no-swipe-nav viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="cakeGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#FFC94D"/>
+          <stop offset="100%" stop-color="#FF7A59"/>
+        </linearGradient>
+      </defs>
+      <circle cx="150" cy="150" r="128" fill="url(#cakeGrad)" stroke="#A81E52" stroke-width="4"/>
+      <circle cx="150" cy="150" r="128" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="9" stroke-dasharray="3 11"/>
+      <polyline id="cutTrail" points="" fill="none" stroke="#341C2B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+      <path id="cakeWedgeMark" d="" fill="none" stroke="#341C2B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0"/>
+    </svg>
+  </div>
+
+  <div class="blow-meter" id="blowMeter"><div class="blow-meter-fill" id="blowMeterFill"></div></div>
+  <button class="mic-btn reveal" id="micBtn">🎤 Blow into your mic</button>
+  <div class="mic-status" id="micStatus"></div>
+  <div class="wish-reveal" id="wishReveal">Whatever you wished for — I hope I get to be part of it.</div>
+  <button class="quiz-restart candle-replay-btn" id="candleReplayBtn">Light it again</button>
+  <div class="cake-cut-hint" id="cakeCutHint">Now drag on the cake: start at one edge, through the middle, out to another edge 🔪</div>
 </section>
 
 <!-- ================= COMPLIMENT GENERATOR ================= -->
@@ -830,34 +985,6 @@
   </div>
 </section>
 
-<!-- ================= QUIZ CHALLENGE ================= -->
-<section id="quiz" class="slide">
-  <div class="section-head reveal">
-    <div class="eyebrow">Challenge time</div>
-    <h2>How Well Do You Know Us?</h2>
-    <p>A little quiz about our story. No pressure — you already know the most important answer: yes, I love you.</p>
-  </div>
-
-  <div class="quiz-card reveal">
-    <div class="quiz-progress-track"><div class="quiz-progress-fill" id="quizProgressFill"></div></div>
-    <div class="quiz-counter" id="quizCounter">Question 1 of 5</div>
-
-    <div id="quizActive">
-      <div class="quiz-question" id="quizQuestion"></div>
-      <div class="quiz-options" id="quizOptions"></div>
-      <div class="quiz-feedback" id="quizFeedback"></div>
-      <button class="quiz-next" id="quizNextBtn">Next question →</button>
-    </div>
-
-    <div class="quiz-result" id="quizResult">
-      <div class="eyebrow">Final score</div>
-      <div class="score" id="quizScore">0 / 0</div>
-      <p id="quizResultMsg">You know us pretty well.</p>
-      <button class="quiz-restart" id="quizRestartBtn">Play again</button>
-    </div>
-  </div>
-</section>
-
 <!-- ================= MINI GAMES ================= -->
 <section id="games" class="slide">
   <div class="section-head reveal">
@@ -871,7 +998,7 @@
     <div class="game-card stagger-item">
       <h3>Catch the Hearts 💕</h3>
       <p class="game-desc">15 seconds, fast hearts. Tap the pink ones, avoid the broken 💔 ones (they cost you).</p>
-      <div class="heart-arena" id="heartArena">
+      <div class="heart-arena" id="heartArena" data-no-swipe-nav>
         <div class="game-hud">
           <span id="heartScore">Score: 0</span>
           <span id="heartTimer">15s</span>
@@ -900,25 +1027,6 @@
       </div>
     </div>
   </div>
-</section>
-
-<!-- ================= WISH ================= -->
-<section id="wish" class="slide">
-  <div class="section-head reveal" style="margin-bottom:0;">
-    <div class="eyebrow">Make a wish</div>
-    <h2>Blow out the candle</h2>
-  </div>
-  <div class="cake-wrap reveal">
-    <div class="candle" id="candle">
-      <div class="flame" id="flame"></div>
-    </div>
-  </div>
-  <div class="blow-meter" id="blowMeter"><div class="blow-meter-fill" id="blowMeterFill"></div></div>
-  <button class="mic-btn reveal" id="micBtn">🎤 Blow into your mic</button>
-  <div class="mic-status" id="micStatus"></div>
-  <div class="wish-reveal" id="wishReveal">Whatever you wished for — I hope I get to be part of it.</div>
-  <button class="quiz-restart candle-replay-btn" id="candleReplayBtn">Light it again</button>
-  <div style="height:2.5rem;"></div>
 </section>
 
 <!-- ================= FINAL LETTER (code-gated) ================= -->
@@ -995,6 +1103,41 @@
     burstConfetti(70);
     playTune();
     startSlides();
+    startBackgroundSong();
+  });
+
+  /* ================= BACKGROUND SONG (real uploaded audio file, loops always) ================= */
+  var bgSong = document.getElementById('bgSong');
+  var songToggle = document.getElementById('songToggle');
+  var songStarted = false;
+
+  function startBackgroundSong(){
+    if(songStarted) return;
+    songStarted = true;
+    bgSong.volume = 0.55;
+    var playPromise = bgSong.play();
+    if(playPromise && playPromise.catch){
+      playPromise.then(function(){
+        songToggle.textContent = '🎶';
+        songToggle.classList.add('playing');
+      }).catch(function(){
+        // No file uploaded yet, or autoplay blocked — she can still tap the button.
+        songToggle.title = 'Tap to play the background song (add background-song.mp3 to enable)';
+      });
+    }
+  }
+
+  songToggle.addEventListener('click', function(){
+    if(bgSong.paused){
+      bgSong.play().then(function(){
+        songToggle.classList.add('playing');
+      }).catch(function(){
+        songToggle.title = 'Add a background-song.mp3 file next to index.html first';
+      });
+    } else {
+      bgSong.pause();
+      songToggle.classList.remove('playing');
+    }
   });
 
   /* ================= HAPPY BIRTHDAY TUNE (synthesized, no audio file needed) ================= */
@@ -1087,6 +1230,7 @@
   var complimentBtn = document.getElementById('complimentBtn');
   var lastComplimentIndex = -1;
   complimentBtn.addEventListener('click', function(){
+    if(navigator.vibrate){ try{ navigator.vibrate(15); }catch(e){} }
     var idx;
     do { idx = Math.floor(Math.random() * compliments.length); } while(idx === lastComplimentIndex && compliments.length > 1);
     lastComplimentIndex = idx;
@@ -1096,6 +1240,33 @@
       complimentTextEl.style.transition = 'opacity 0.35s ease';
       complimentTextEl.style.opacity = '1';
     }, 180);
+  });
+
+  /* ================= HEARTBEAT HOLD ================= */
+  var heartbeatHeart = document.getElementById('heartbeatHeart');
+  var heartbeatOverlay = document.getElementById('heartbeatOverlay');
+  var heartbeatCloseBtn = document.getElementById('heartbeatCloseBtn');
+  var heartbeatTimer = null;
+  var HOLD_DURATION = 1200;
+
+  function startHold(){
+    heartbeatHeart.classList.add('growing');
+    heartbeatTimer = setTimeout(function(){
+      heartbeatOverlay.classList.add('show');
+      burstConfetti(80);
+      if(navigator.vibrate){ try{ navigator.vibrate([30,50,30,50,80]); }catch(e){} }
+    }, HOLD_DURATION);
+  }
+  function cancelHold(){
+    heartbeatHeart.classList.remove('growing');
+    clearTimeout(heartbeatTimer);
+  }
+  heartbeatHeart.addEventListener('pointerdown', startHold);
+  heartbeatHeart.addEventListener('pointerup', cancelHold);
+  heartbeatHeart.addEventListener('pointerleave', cancelHold);
+  heartbeatCloseBtn.addEventListener('click', function(){
+    heartbeatOverlay.classList.remove('show');
+    cancelHold();
   });
 
   /* ================= FINAL CODE GATE ================= */
@@ -1114,6 +1285,7 @@
       codeForm.style.display = 'none';
       codeUnlockedContent.style.display = '';
       burstConfetti(100);
+      if(navigator.vibrate){ try{ navigator.vibrate([20,40,20,40,100]); }catch(e){} }
     } else {
       codeError.textContent = "That's not quite it — try again.";
       codeInput.value = '';
@@ -1231,6 +1403,12 @@
 
   var touchStartX = null, touchStartY = null;
   document.addEventListener('touchstart', function(e){
+    // Elements that handle their own drag gestures (the cake cut zone, falling
+    // hearts, etc.) opt out of being treated as a slide-swipe.
+    if(e.target.closest && e.target.closest('[data-no-swipe-nav]')){
+      touchStartX = null;
+      return;
+    }
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
   }, { passive:true });
@@ -1249,98 +1427,6 @@
     card.addEventListener('click', function(){ card.classList.toggle('flipped'); });
   });
 
-  /* ================= QUIZ ================= */
-  // QUIZ QUESTIONS: edit question / options / correctIndex. Add/remove objects freely.
-  var quizQuestions = [
-    { question: "Placeholder: Where did we first meet?", options: ["Option A","Option B","Option C","Option D"], correctIndex: 0 },
-    { question: "Placeholder: What was our first date?", options: ["Option A","Option B","Option C","Option D"], correctIndex: 1 },
-    { question: "Placeholder: What's my favorite thing about her?", options: ["Option A","Option B","Option C","Option D"], correctIndex: 2 },
-    { question: "Placeholder: What's her favorite workout?", options: ["Option A","Option B","Option C","Option D"], correctIndex: 0 },
-    { question: "Placeholder: What song reminds us of each other?", options: ["Option A","Option B","Option C","Option D"], correctIndex: 3 }
-  ];
-
-  var qIndex = 0;
-  var score = 0;
-  var answered = false;
-
-  var quizQuestionEl = document.getElementById('quizQuestion');
-  var quizOptionsEl = document.getElementById('quizOptions');
-  var quizFeedbackEl = document.getElementById('quizFeedback');
-  var quizNextBtn = document.getElementById('quizNextBtn');
-  var quizCounterEl = document.getElementById('quizCounter');
-  var quizProgressFill = document.getElementById('quizProgressFill');
-  var quizActiveEl = document.getElementById('quizActive');
-  var quizResultEl = document.getElementById('quizResult');
-  var quizScoreEl = document.getElementById('quizScore');
-  var quizResultMsgEl = document.getElementById('quizResultMsg');
-  var quizRestartBtn = document.getElementById('quizRestartBtn');
-
-  function renderQuestion(){
-    answered = false;
-    var q = quizQuestions[qIndex];
-    quizCounterEl.textContent = 'Question ' + (qIndex+1) + ' of ' + quizQuestions.length;
-    quizProgressFill.style.width = ((qIndex) / quizQuestions.length * 100) + '%';
-    quizQuestionEl.textContent = q.question;
-    quizFeedbackEl.textContent = '';
-    quizNextBtn.classList.remove('show');
-    quizOptionsEl.innerHTML = '';
-    q.options.forEach(function(opt, i){
-      var btn = document.createElement('button');
-      btn.className = 'quiz-option';
-      btn.textContent = opt;
-      btn.addEventListener('click', function(){ selectAnswer(i, btn); });
-      quizOptionsEl.appendChild(btn);
-    });
-  }
-
-  function selectAnswer(i, btn){
-    if(answered) return;
-    answered = true;
-    var q = quizQuestions[qIndex];
-    var allBtns = quizOptionsEl.querySelectorAll('.quiz-option');
-    allBtns.forEach(function(b){ b.disabled = true; });
-    if(i === q.correctIndex){
-      btn.classList.add('correct');
-      quizFeedbackEl.textContent = 'Correct! You really do pay attention.';
-      score++;
-      burstConfetti(40);
-    } else {
-      btn.classList.add('wrong');
-      allBtns[q.correctIndex].classList.add('correct');
-      quizFeedbackEl.textContent = "Not quite — but it's the thought that counts.";
-    }
-    quizNextBtn.classList.add('show');
-  }
-
-  quizNextBtn.addEventListener('click', function(){
-    qIndex++;
-    if(qIndex >= quizQuestions.length){
-      showResult();
-    } else {
-      renderQuestion();
-    }
-  });
-
-  function showResult(){
-    quizProgressFill.style.width = '100%';
-    quizActiveEl.style.display = 'none';
-    quizResultEl.classList.add('show');
-    quizScoreEl.textContent = score + ' / ' + quizQuestions.length;
-    var pct = score / quizQuestions.length;
-    if(pct === 1){ quizResultMsgEl.textContent = 'Perfect score. You know us better than I do.'; burstConfetti(120); }
-    else if(pct >= 0.6){ quizResultMsgEl.textContent = "Pretty good — we've got a good thing going."; }
-    else { quizResultMsgEl.textContent = "We clearly need more dates to make more memories."; }
-  }
-
-  quizRestartBtn.addEventListener('click', function(){
-    qIndex = 0; score = 0;
-    quizResultEl.classList.remove('show');
-    quizActiveEl.style.display = '';
-    renderQuestion();
-  });
-
-  renderQuestion();
-
   /* ================= CANDLE ================= */
   var candle = document.getElementById('candle');
   var flame = document.getElementById('flame');
@@ -1354,6 +1440,7 @@
     blowMeterFill.style.width = '0%';
     wishReveal.classList.add('show');
     burstConfetti(90);
+    enableCakeCut();
   }
 
   var candleReplayBtn = document.getElementById('candleReplayBtn');
@@ -1365,6 +1452,127 @@
     blowMeterFill.style.width = '0%';
     micStatus.textContent = '';
     micBtn.disabled = false;
+    resetCakeCut();
+  });
+
+  /* ================= CAKE CUTTING (touch gesture, real triangular cut) ================= */
+  var cakeSvg = document.getElementById('cakeSvg');
+  var cutTrail = document.getElementById('cutTrail');
+  var cakeWedgeMark = document.getElementById('cakeWedgeMark');
+  var cakeCutHint = document.getElementById('cakeCutHint');
+  var cakeSlicePopup = document.getElementById('cakeSlicePopup');
+  var cakeSliceCloseBtn = document.getElementById('cakeSliceCloseBtn');
+  var CAKE_CX = 150, CAKE_CY = 150, CAKE_R = 128;
+  var cutEnabled = false;
+  var cutPath = null;
+  var cutActive = false;
+  var sliceCut = false;
+
+  function vibrate(pattern){
+    if(navigator.vibrate){ try{ navigator.vibrate(pattern); }catch(e){} }
+  }
+
+  function enableCakeCut(){
+    cutEnabled = true;
+    cakeCutHint.classList.add('show');
+  }
+
+  function svgPoint(clientX, clientY){
+    var pt = cakeSvg.createSVGPoint();
+    pt.x = clientX; pt.y = clientY;
+    var ctm = cakeSvg.getScreenCTM();
+    if(!ctm) return { x:0, y:0 };
+    var loc = pt.matrixTransform(ctm.inverse());
+    return { x: loc.x, y: loc.y };
+  }
+
+  function pathToPoints(str){
+    return str.trim().split(' ').filter(Boolean).map(function(pair){
+      var xy = pair.split(',');
+      return { x: parseFloat(xy[0]), y: parseFloat(xy[1]) };
+    });
+  }
+
+  function dist(a, b){ return Math.hypot(a.x - b.x, a.y - b.y); }
+
+  function validateCut(points){
+    if(points.length < 4) return null;
+    var center = { x: CAKE_CX, y: CAKE_CY };
+    var start = points[0];
+    var end = points[points.length - 1];
+    // find the point in the path that comes closest to the center (the "vertex" of the cut)
+    var vertex = points[0], vertexDist = dist(points[0], center);
+    points.forEach(function(p){
+      var d = dist(p, center);
+      if(d < vertexDist){ vertexDist = d; vertex = p; }
+    });
+    if(vertexDist > CAKE_R * 0.4) return null; // never actually got near the middle
+    if(dist(start, center) < CAKE_R * 0.55) return null; // start wasn't near the edge
+    if(dist(end, center) < CAKE_R * 0.55) return null; // end wasn't near the edge
+    var v1 = { x: start.x - vertex.x, y: start.y - vertex.y };
+    var v2 = { x: end.x - vertex.x, y: end.y - vertex.y };
+    var angle = Math.abs(Math.atan2(v1.x*v2.y - v1.y*v2.x, v1.x*v2.x + v1.y*v2.y)) * 180 / Math.PI;
+    if(angle < 20 || angle > 160) return null; // too straight — not a real wedge
+    return {
+      startAngle: Math.atan2(start.y - CAKE_CY, start.x - CAKE_CX),
+      endAngle: Math.atan2(end.y - CAKE_CY, end.x - CAKE_CX)
+    };
+  }
+
+  function drawWedgeMark(startAngle, endAngle){
+    var x1 = CAKE_CX + Math.cos(startAngle) * CAKE_R;
+    var y1 = CAKE_CY + Math.sin(startAngle) * CAKE_R;
+    var x2 = CAKE_CX + Math.cos(endAngle) * CAKE_R;
+    var y2 = CAKE_CY + Math.sin(endAngle) * CAKE_R;
+    cakeWedgeMark.setAttribute('d', 'M ' + x1 + ',' + y1 + ' L ' + CAKE_CX + ',' + CAKE_CY + ' L ' + x2 + ',' + y2);
+    cakeWedgeMark.style.opacity = '1';
+  }
+
+  function resetCakeCut(){
+    cutEnabled = false;
+    sliceCut = false;
+    cutPath = null;
+    cutTrail.setAttribute('points', '');
+    cakeWedgeMark.style.opacity = '0';
+    cakeCutHint.classList.remove('show', 'error');
+    cakeCutHint.textContent = 'Now drag on the cake: start at one edge, through the middle, out to another edge 🔪';
+    cakeSlicePopup.classList.remove('show');
+  }
+
+  cakeSvg.addEventListener('pointerdown', function(e){
+    if(!cutEnabled || sliceCut) return;
+    cutActive = true;
+    cutPath = [svgPoint(e.clientX, e.clientY)];
+    cakeCutHint.classList.remove('error');
+  });
+  cakeSvg.addEventListener('pointermove', function(e){
+    if(!cutActive) return;
+    cutPath.push(svgPoint(e.clientX, e.clientY));
+    cutTrail.setAttribute('points', cutPath.map(function(p){ return p.x + ',' + p.y; }).join(' '));
+  });
+  window.addEventListener('pointerup', function(){
+    if(!cutActive) return;
+    cutActive = false;
+    var result = cutPath ? validateCut(cutPath) : null;
+    cutTrail.setAttribute('points', '');
+    if(result){
+      sliceCut = true;
+      drawWedgeMark(result.startAngle, result.endAngle);
+      cakeCutHint.classList.remove('show');
+      vibrate([20, 40, 20]);
+      setTimeout(function(){
+        cakeSlicePopup.classList.add('show');
+        burstConfetti(70);
+        vibrate(60);
+      }, 350);
+    } else {
+      cakeCutHint.classList.add('error');
+      cakeCutHint.textContent = "Not quite — drag from one edge, through the middle, to another edge.";
+    }
+  });
+
+  cakeSliceCloseBtn.addEventListener('click', function(){
+    cakeSlicePopup.classList.remove('show');
   });
 
   /* ================= MIC BLOW DETECTION (iPhone microphone) ================= */
@@ -1517,7 +1725,27 @@
     } else {
       shakeEnableBtn.textContent = 'Motion sensors not supported here';
     }
+    enableTiltParallax();
   });
+
+  /* ================= DEVICE TILT (gyroscope) PARALLAX ================= */
+  // Floating hearts drift slightly with the phone's tilt. Piggybacks on the
+  // same motion-permission gesture as the shake game so she isn't asked twice.
+  var tiltX = 0, tiltY = 0;
+  function handleTilt(e){
+    if(e.gamma === null || e.beta === null) return;
+    tiltX = Math.max(-1, Math.min(1, e.gamma / 30));
+    tiltY = Math.max(-1, Math.min(1, (e.beta - 45) / 30));
+  }
+  function enableTiltParallax(){
+    if(typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){
+      DeviceOrientationEvent.requestPermission().then(function(state){
+        if(state === 'granted'){ window.addEventListener('deviceorientation', handleTilt); }
+      }).catch(function(){});
+    } else if(typeof DeviceOrientationEvent !== 'undefined'){
+      window.addEventListener('deviceorientation', handleTilt);
+    }
+  }
 
   shakeReplayBtn.addEventListener('click', function(){
     shakeUnlocked = false;
@@ -1691,9 +1919,10 @@
       hearts.forEach(function(h){
         h.y -= h.speed;
         h.wobble += 0.01;
-        h.x += Math.sin(h.wobble)*h.drift;
+        h.x += Math.sin(h.wobble)*h.drift + tiltX*1.6;
+        var drawY = h.y + tiltY*18;
         if(h.y < -20){ h.y = aCanvas.height + 20; h.x = Math.random()*aCanvas.width; }
-        drawHeart(h.x, h.y, h.size, h.opacity);
+        drawHeart(h.x, drawY, h.size, h.opacity);
       });
     }
     requestAnimationFrame(animateAmbient);
