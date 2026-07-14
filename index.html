@@ -3,10 +3,12 @@
   ============================================================
   TWESHA'S BIRTHDAY SURPRISE — quick customization guide
   ============================================================
-  1. PHOTOS: search "PHOTOS:" in the gallery section — drop
-     image1.jpg, image2.png, image3.png, image4.png and
-     image5.png in this same folder, or edit the filenames
-     in the <img src="..."> tags to match whatever you have.
+  1. PHOTOS: drop image1.jpg through image5.jpg in this same
+     folder (or edit the filenames in the <img src="..."> tags
+     to match whatever you have). They're used twice — as the
+     collage behind the opening landing screen (search
+     "hero-collage") and again in the gallery (search
+     "PHOTOS:" further down).
 
   2. CAKE CUT MESSAGE: search "cake-slice-msg" for the text
      shown when she successfully cuts a slice.
@@ -54,8 +56,6 @@
     --paper:#FFFDFB;
     --shadow: 0 20px 40px -20px rgba(52,28,43,0.35);
     --radius: 22px;
-    /* HERO BACKGROUND IMAGE: swap this filename for any image dropped in this folder */
-    --hero-bg-image: url('image6.jpg');
   }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
@@ -128,12 +128,19 @@
   /* ---------- SLIDES / PAGINATION ---------- */
   .slide{
     position:fixed; inset:0;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    display:flex; flex-direction:column; align-items:center;
+    /* flex-start is the fallback for browsers without "safe center" support below —
+       plain "center" here would center content taller than the screen and make
+       its top half permanently unreachable by scrolling (scrollTop can't go negative) */
+    justify-content:flex-start;
     overflow-y:auto;
     padding:5.5rem 1.5rem 6.5rem;
     opacity:0; visibility:hidden; pointer-events:none;
     transition:opacity 0.5s ease;
     z-index:5;
+  }
+  @supports (justify-content: safe center){
+    .slide{ justify-content:safe center; }
   }
   .slide > *{ max-width:980px; width:100%; margin-left:auto; margin-right:auto; }
   .slide > button{ width:auto; max-width:none; align-self:center; }
@@ -361,21 +368,52 @@
   /* ---------- HERO ---------- */
   #hero{
     min-height:100svh;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
     text-align:center;
     padding-top:4rem;
     padding-bottom:4rem;
-    background:
-      radial-gradient(circle at 15% 20%, rgba(255,201,77,0.28), transparent 45%),
-      radial-gradient(circle at 85% 75%, rgba(183,227,138,0.28), transparent 45%),
-      linear-gradient(180deg, rgba(255,243,237,0.82) 0%, rgba(255,232,222,0.88) 100%),
-      var(--hero-bg-image) center/cover no-repeat,
-      var(--cream);
+    background:linear-gradient(180deg, var(--cream) 0%, var(--cream-2) 100%);
     overflow:hidden;
   }
+  .hero-collage, .hero-scrim{ max-width:none; width:auto; margin:0; }
+  .hero-collage{
+    position:absolute; inset:0; z-index:0;
+  }
+  .collage-tile{
+    position:absolute;
+    width:32vw; max-width:190px; min-width:118px;
+    height:38vw; max-height:230px; min-height:145px;
+    object-fit:cover; border-radius:16px;
+    border:7px solid var(--paper);
+    box-shadow:0 18px 32px -12px rgba(52,28,43,0.5);
+    transition:opacity 1.1s ease, transform 1.1s cubic-bezier(.2,.8,.2,1);
+  }
+  .collage-tile.reveal{ opacity:0; }
+  .collage-tile.reveal.visible{ opacity:1; }
+  .ct-1{ top:4%; left:1%; transform:rotate(-9deg); transition-delay:0.05s; }
+  .ct-1.reveal{ transform:rotate(-9deg) translateY(-24px); }
+  .ct-1.reveal.visible{ transform:rotate(-9deg) translateY(0); }
+  .ct-2{ top:6%; right:2%; transform:rotate(7deg); transition-delay:0.15s; }
+  .ct-2.reveal{ transform:rotate(7deg) translateY(-24px); }
+  .ct-2.reveal.visible{ transform:rotate(7deg) translateY(0); }
+  .ct-3{ bottom:8%; left:4%; transform:rotate(6deg); transition-delay:0.25s; }
+  .ct-3.reveal{ transform:rotate(6deg) translateY(24px); }
+  .ct-3.reveal.visible{ transform:rotate(6deg) translateY(0); }
+  .ct-4{ bottom:4%; right:5%; transform:rotate(-7deg); transition-delay:0.35s; }
+  .ct-4.reveal{ transform:rotate(-7deg) translateY(24px); }
+  .ct-4.reveal.visible{ transform:rotate(-7deg) translateY(0); }
+  .ct-5{
+    top:50%; left:50%; z-index:-1; opacity:0.55 !important;
+    width:38vw; max-width:220px; height:44vw; max-height:260px;
+    transform:translate(-50%,-50%) rotate(-3deg);
+  }
+  .ct-5.reveal.visible{ opacity:0.55 !important; }
+  .hero-scrim{
+    position:absolute; inset:0; z-index:1; pointer-events:none;
+    background:radial-gradient(circle at 50% 46%,
+      rgba(255,243,237,0.94) 0%, rgba(255,243,237,0.86) 32%,
+      rgba(255,232,222,0.62) 62%, rgba(255,232,222,0.2) 100%);
+  }
+  .hero-content{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; }
   .time-greeting{
     font-family:'Fraunces', serif; font-style:italic; font-size:1.05rem;
     color:var(--berry-deep); margin-top:0.4rem;
@@ -597,7 +635,7 @@
 
   /* ---------- MINI GAMES ---------- */
   #games{ background:var(--cream); }
-  .game-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.5rem; }
+  .game-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.5rem; max-width:420px; margin:0 auto; }
   .game-card{ background:var(--paper); border-radius:24px; box-shadow:var(--shadow); padding:1.7rem; }
   .game-card h3{ font-family:'Fraunces', serif; font-size:1.2rem; margin:0 0 0.4rem; }
   .game-desc{ color:#5B3B4C; font-size:0.9rem; margin:0 0 0.2rem; }
@@ -616,42 +654,6 @@
     animation:slice-pop 0.4s cubic-bezier(.2,.8,.2,1) both;
   }
   .video-modal-close-btn{ width:100%; margin-top:1rem; }
-
-  .heart-arena{
-    position:relative; height:320px; margin-top:1rem;
-    background:linear-gradient(160deg, var(--cream-2), var(--paper));
-    border-radius:18px; overflow:hidden;
-    touch-action:manipulation;
-  }
-  .game-hud{
-    position:absolute; top:0; left:0; right:0; z-index:2;
-    display:flex; justify-content:space-between;
-    padding:0.7rem 1rem; font-weight:700; font-size:0.85rem; color:var(--berry-deep);
-  }
-  .falling-heart{
-    position:absolute; top:-40px;
-    width:40px; height:40px;
-    display:flex; align-items:center; justify-content:center;
-    font-size:1.6rem; line-height:1;
-    cursor:pointer; user-select:none; animation:fall linear forwards;
-    touch-action:manipulation; -webkit-tap-highlight-color:transparent;
-  }
-  @keyframes fall{ from{ transform:translateY(0); } to{ transform:translateY(380px); } }
-  .falling-heart.decoy{ filter:grayscale(0.35) brightness(0.9); }
-  .game-start-btn{
-    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:3;
-    font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:0.9rem;
-    background:var(--ink); color:var(--cream); border:none;
-    padding:0.85rem 1.7rem; border-radius:999px; cursor:pointer;
-  }
-  .game-over-panel{
-    position:absolute; inset:0; z-index:4; display:none;
-    flex-direction:column; align-items:center; justify-content:center; text-align:center;
-    background:rgba(255,253,251,0.95); padding:1rem;
-  }
-  .game-over-panel.show{ display:flex; }
-  .game-over-panel .score{ font-family:'Fraunces', serif; font-size:2.2rem; color:var(--berry-deep); margin:0.3rem 0; }
-  .game-over-panel p{ color:#5B3B4C; font-size:0.9rem; max-width:280px; }
 
   .shake-box{ text-align:center; padding:0.6rem 0 0.2rem; }
   .shake-icon{ font-size:3rem; margin-bottom:0.8rem; animation:shake-wiggle 1.6s ease-in-out infinite; }
@@ -867,20 +869,31 @@
 
 <!-- ================= HERO ================= -->
 <section id="hero" class="slide">
-  <div class="hero-badge reveal">🎂 A little something from your person</div>
-  <h1 class="hero-title reveal"><span>Happy Birthday</span><em>Twesha</em></h1>
-  <p class="hero-sub reveal">Kind, gorgeous, and the owner of a smile that ends arguments before they start. Today is entirely about you.</p>
-  <div class="time-greeting reveal" id="timeGreeting"></div>
+  <div class="hero-collage" aria-hidden="true">
+    <img class="collage-tile ct-1 reveal" src="image1.jpg" alt="">
+    <img class="collage-tile ct-2 reveal" src="image2.jpg" alt="">
+    <img class="collage-tile ct-3 reveal" src="image3.jpg" alt="">
+    <img class="collage-tile ct-4 reveal" src="image4.jpg" alt="">
+    <img class="collage-tile ct-5 reveal" src="image5.jpg" alt="">
+  </div>
+  <div class="hero-scrim"></div>
 
-  <div id="status-panel" class="reveal"></div>
+  <div class="hero-content">
+    <div class="hero-badge reveal">🎂 A little something from your person</div>
+    <h1 class="hero-title reveal"><span>Happy Birthday</span><em>Twesha</em></h1>
+    <p class="hero-sub reveal">Kind, gorgeous, and the owner of a smile that ends arguments before they start. Today is entirely about you.</p>
+    <div class="time-greeting reveal" id="timeGreeting"></div>
 
-  <div class="heartbeat-heart reveal" id="heartbeatHeart">❤️</div>
-  <div class="heartbeat-hint reveal">press and hold</div>
+    <div id="status-panel" class="reveal"></div>
 
-  <button class="scroll-cue reveal" id="heroNextBtn" type="button">
-    <span>tap for your surprise</span>
-    <span>↓</span>
-  </button>
+    <div class="heartbeat-heart reveal" id="heartbeatHeart">❤️</div>
+    <div class="heartbeat-hint reveal">press and hold</div>
+
+    <button class="scroll-cue reveal" id="heroNextBtn" type="button">
+      <span>tap for your surprise</span>
+      <span>↓</span>
+    </button>
+  </div>
 </section>
 
 <!-- ================= CAKE + CANDLES + CUT ================= -->
@@ -960,36 +973,17 @@
   </div>
 
   <div class="game-grid reveal-stagger reveal">
-    <!-- GAME 1: Shake for a Secret (uses iPhone motion sensors) -->
+    <!-- Shake for a Secret (uses iPhone motion sensors) -->
     <div class="game-card stagger-item">
       <h3>Shake for a Secret 📱</h3>
-      <p class="game-desc">Give your phone a little shake to unlock a hidden note.</p>
+      <p class="game-desc">Now shake your phone to relive some precious happy moments!</p>
       <div class="shake-box">
         <div class="shake-icon" id="shakeIcon">🤫</div>
         <button class="mic-btn" id="shakeEnableBtn">Enable & shake</button>
         <div class="mic-status" id="shakeStatus"></div>
         <!-- SHAKE SECRET: edit this hidden message -->
-        <div class="shake-secret-msg" id="shakeSecretMsg">Placeholder: here's a secret I've never told you...</div>
+        <div class="shake-secret-msg" id="shakeSecretMsg">Here's to many more moments like these 💌</div>
         <button class="quiz-restart shake-replay-btn" id="shakeReplayBtn">Play again</button>
-      </div>
-    </div>
-
-    <!-- GAME 2: Catch the Hearts -->
-    <div class="game-card stagger-item">
-      <h3>Catch the Hearts 💕</h3>
-      <p class="game-desc">15 seconds, fast hearts. Tap the pink ones, avoid the broken 💔 ones (they cost you).</p>
-      <div class="heart-arena" id="heartArena" data-no-swipe-nav>
-        <div class="game-hud">
-          <span id="heartScore">Score: 0</span>
-          <span id="heartTimer">15s</span>
-        </div>
-        <button class="game-start-btn" id="heartStartBtn">Start</button>
-        <div class="game-over-panel" id="heartOverPanel">
-          <div class="eyebrow">Time's up</div>
-          <div class="score" id="heartFinalScore">0</div>
-          <p id="heartResultMsg"></p>
-          <button class="quiz-restart" id="heartReplayBtn">Play again</button>
-        </div>
       </div>
     </div>
   </div>
@@ -1005,7 +999,7 @@
       <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="codeInput" placeholder="••••">
       <div><button class="code-submit-btn" id="codeSubmitBtn">Unlock</button></div>
       <div class="code-error" id="codeError"></div>
-      <div class="code-hint">Hint: our two birthdays.</div>
+      <div class="code-hint">Hint: our birthdays...</div>
     </div>
     <div class="code-unlocked-content" id="codeUnlockedContent" style="display:none;">
       <!-- FINAL LETTER: edit this paragraph -->
@@ -1729,83 +1723,6 @@
     secretVideo.pause();
   }
   videoModalCloseBtn.addEventListener('click', closeSecretVideo);
-
-  /* ================= CATCH THE HEARTS GAME ================= */
-  var heartArena = document.getElementById('heartArena');
-  var heartStartBtn = document.getElementById('heartStartBtn');
-  var heartScoreEl = document.getElementById('heartScore');
-  var heartTimerEl = document.getElementById('heartTimer');
-  var heartOverPanel = document.getElementById('heartOverPanel');
-  var heartFinalScoreEl = document.getElementById('heartFinalScore');
-  var heartResultMsgEl = document.getElementById('heartResultMsg');
-  var heartReplayBtn = document.getElementById('heartReplayBtn');
-
-  var heartGameRunning = false;
-  var heartScore = 0;
-  var heartTimeLeft = 15;
-  var heartSpawnTimer, heartCountdownTimer;
-  var heartEmojis = ['💕','💖','💗','❤️','💓'];
-  var DECOY_EMOJI = '💔';
-  var DECOY_CHANCE = 0.25;
-
-  function spawnFallingHeart(){
-    var el = document.createElement('div');
-    var isDecoy = Math.random() < DECOY_CHANCE;
-    el.className = 'falling-heart' + (isDecoy ? ' decoy' : '');
-    el.textContent = isDecoy ? DECOY_EMOJI : heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
-    var arenaWidth = heartArena.clientWidth;
-    el.style.left = (Math.random() * Math.max(arenaWidth - 40, 0)) + 'px';
-    el.style.animationDuration = (1.1 + Math.random()*0.9) + 's';
-    var caught = false;
-    el.addEventListener('pointerdown', function(e){
-      if(!heartGameRunning || caught) return;
-      caught = true;
-      e.preventDefault();
-      if(isDecoy){
-        heartScore = Math.max(0, heartScore - 2);
-      } else {
-        heartScore++;
-      }
-      heartScoreEl.textContent = 'Score: ' + heartScore;
-      el.remove();
-    });
-    el.addEventListener('animationend', function(){ el.remove(); });
-    heartArena.appendChild(el);
-  }
-
-  function startHeartGame(){
-    heartGameRunning = true;
-    heartScore = 0;
-    heartTimeLeft = 15;
-    heartScoreEl.textContent = 'Score: 0';
-    heartTimerEl.textContent = heartTimeLeft + 's';
-    heartOverPanel.classList.remove('show');
-    heartStartBtn.style.display = 'none';
-    heartSpawnTimer = setInterval(spawnFallingHeart, 420);
-    heartCountdownTimer = setInterval(function(){
-      heartTimeLeft--;
-      heartTimerEl.textContent = heartTimeLeft + 's';
-      if(heartTimeLeft <= 0){ endHeartGame(); }
-    }, 1000);
-  }
-
-  function endHeartGame(){
-    heartGameRunning = false;
-    clearInterval(heartSpawnTimer);
-    clearInterval(heartCountdownTimer);
-    heartArena.querySelectorAll('.falling-heart').forEach(function(h){ h.remove(); });
-    heartFinalScoreEl.textContent = heartScore;
-    if(heartScore >= 12){ heartResultMsgEl.textContent = 'Okay champion, that was impressive.'; burstConfetti(80); }
-    else if(heartScore >= 6){ heartResultMsgEl.textContent = "Solid — you've got quick hands."; }
-    else { heartResultMsgEl.textContent = "We'll call that a warm-up round."; }
-    heartOverPanel.classList.add('show');
-  }
-
-  heartStartBtn.addEventListener('click', startHeartGame);
-  heartReplayBtn.addEventListener('click', function(){
-    heartOverPanel.classList.remove('show');
-    startHeartGame();
-  });
 
   /* ================= CONFETTI ================= */
   var canvas = document.getElementById('confetti-canvas');
