@@ -1633,9 +1633,22 @@
       analyser.fftSize = 512;
       source.connect(analyser);
       var data = new Uint8Array(analyser.fftSize);
-      var THRESHOLD = 36;
       var blowStrength = 0;
       var stopped = false;
+
+      // Every phone/room is different (mic gain, ambient noise, how far she's
+      // holding it), so a single fixed volume threshold is unreliable — that's
+      // the usual cause of "works sometimes, not others". Instead, spend the
+      // first ~400ms listening to the room quietly and calibrate the threshold
+      // relative to THAT noise floor, and smooth the raw reading frame-to-frame
+      // so normal breath unsteadiness doesn't reset all the progress.
+      var CALIBRATION_MS = 400;
+      var calibrationStart = null;
+      var noiseSamples = [];
+      var threshold = null;
+      var smoothedRms = 0;
+      var INCREMENT = 0.045;
+      var DECAY = 0.022;
 
       function cleanup(){
         stopped = true;
@@ -1645,7 +1658,7 @@
         if(songWasPlaying){ bgSong.play().catch(function(){}); }
       }
 
-      function checkVolume(){
+      function checkVolume(ts){
         if(stopped) return;
         if(candle.classList.contains('blown')){ cleanup(); return; }
         analyser.getByteTimeDomainData(data);
@@ -1655,10 +1668,25 @@
           sum += v*v;
         }
         var rms = Math.sqrt(sum/data.length);
-        if(rms > THRESHOLD){
-          blowStrength = Math.min(1, blowStrength + 0.035);
+        smoothedRms = smoothedRms*0.65 + rms*0.35;
+
+        if(calibrationStart === null){ calibrationStart = ts || performance.now(); }
+        if(threshold === null){
+          noiseSamples.push(smoothedRms);
+          if((ts || performance.now()) - calibrationStart < CALIBRATION_MS){
+            micStatus.textContent = 'Calibrating... stay quiet for a sec 🤫';
+            requestAnimationFrame(checkVolume);
+            return;
+          }
+          var avgNoise = noiseSamples.reduce(function(a,b){ return a+b; }, 0) / noiseSamples.length;
+          threshold = Math.max(avgNoise * 1.8 + 6, 14);
+          micStatus.textContent = 'Listening... blow toward your phone 🎤';
+        }
+
+        if(smoothedRms > threshold){
+          blowStrength = Math.min(1, blowStrength + INCREMENT);
         } else {
-          blowStrength = Math.max(0, blowStrength - 0.05);
+          blowStrength = Math.max(0, blowStrength - DECAY);
         }
         blowMeterFill.style.width = (blowStrength*100) + '%';
         flame.style.opacity = String(1 - blowStrength*0.75);
@@ -1670,8 +1698,6 @@
           return;
         } else if(blowStrength > 0.15){
           micStatus.textContent = 'Keep blowing... 🎤';
-        } else {
-          micStatus.textContent = 'Listening... blow toward your phone 🎤';
         }
         requestAnimationFrame(checkVolume);
       }
