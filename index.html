@@ -198,7 +198,15 @@
     background:var(--berry); color:#fff; border:none;
     padding:0.75rem 1.5rem; border-radius:999px; cursor:pointer; box-shadow:var(--shadow);
   }
-  .code-hint{ font-size:0.8rem; color:#8A6172; margin-top:0.8rem; }
+  .code-hint{ font-size:0.8rem; color:rgba(255,243,237,0.75); margin-top:0.8rem; }
+  .code-hint-ask-btn{
+    margin-top:0.9rem;
+    background:none; border:1px solid rgba(255,243,237,0.4);
+    color:rgba(255,243,237,0.85);
+    font-family:'Plus Jakarta Sans', sans-serif; font-size:0.8rem; font-weight:700;
+    padding:0.5rem 1.1rem; border-radius:999px; cursor:pointer;
+  }
+  .code-hint-ask-btn:hover{ background:rgba(255,243,237,0.12); }
   .code-error{ color:var(--coral); font-weight:700; font-size:0.9rem; min-height:1.3em; margin-top:0.6rem; }
   .code-gate.unlocked .code-form{ display:none; }
   .letter-locked-note{ font-size:0.85rem; color:rgba(255,243,237,0.7); margin-top:1rem; }
@@ -1018,7 +1026,8 @@
       <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="codeInput" placeholder="****">
       <div><button class="code-submit-btn" id="codeSubmitBtn">Unlock</button></div>
       <div class="code-error" id="codeError"></div>
-      <div class="code-hint">Hint: our birthdays...</div>
+      <button class="code-hint-ask-btn" id="codeHintAskBtn" style="display:none;">Need a hint?</button>
+      <div class="code-hint" id="codeHint" style="display:none;">Hint: our birthdays...</div>
     </div>
     <div class="code-unlocked-content" id="codeUnlockedContent" style="display:none;">
       <!-- FINAL LETTER: edit this paragraph -->
@@ -1196,11 +1205,15 @@
   /* ================= FINAL CODE GATE ================= */
   // CODE GATE: change '0714' below to whatever date/code you want.
   var UNLOCK_CODE = '0714';
+  var WRONG_ATTEMPTS_BEFORE_HINT = 3; // let her guess a few times before offering help
+  var wrongCodeAttempts = 0;
   var codeGate = document.getElementById('codeGate');
   var codeForm = document.getElementById('codeForm');
   var codeInput = document.getElementById('codeInput');
   var codeSubmitBtn = document.getElementById('codeSubmitBtn');
   var codeError = document.getElementById('codeError');
+  var codeHintAskBtn = document.getElementById('codeHintAskBtn');
+  var codeHint = document.getElementById('codeHint');
   var codeUnlockedContent = document.getElementById('codeUnlockedContent');
 
   function tryUnlockCode(){
@@ -1211,14 +1224,22 @@
       burstConfetti(100);
       if(navigator.vibrate){ try{ navigator.vibrate([20,40,20,40,100]); }catch(e){} }
     } else {
+      wrongCodeAttempts++;
       codeError.textContent = "That's not quite it — try again.";
       codeInput.value = '';
       codeInput.focus();
+      if(wrongCodeAttempts >= WRONG_ATTEMPTS_BEFORE_HINT && codeHint.style.display === 'none'){
+        codeHintAskBtn.style.display = 'inline-block';
+      }
     }
   }
   codeSubmitBtn.addEventListener('click', tryUnlockCode);
   codeInput.addEventListener('keydown', function(e){
     if(e.key === 'Enter'){ tryUnlockCode(); }
+  });
+  codeHintAskBtn.addEventListener('click', function(){
+    codeHint.style.display = 'block';
+    codeHintAskBtn.style.display = 'none';
   });
 
   /* ================= CURSOR HEART TRAIL ================= */
