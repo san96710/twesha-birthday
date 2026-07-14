@@ -194,6 +194,17 @@
   }
   .intro-dot.active{ background:var(--gold); transform:scale(1.3); }
 
+  .music-toggle{
+    position:fixed; top:1.1rem; right:1.1rem; z-index:2100;
+    width:46px; height:46px; border-radius:50%;
+    background:var(--paper); border:1px solid rgba(214,51,108,0.18);
+    box-shadow:var(--shadow); font-size:1.2rem; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:transform 0.2s ease;
+  }
+  .music-toggle:hover{ transform:scale(1.08); }
+  .music-toggle.playing{ animation:pulse-glow 1.6s ease-in-out infinite; }
+
   /* ---------- HERO ---------- */
   #hero{
     min-height:100svh;
@@ -463,6 +474,7 @@
     position:relative; height:320px; margin-top:1rem;
     background:linear-gradient(160deg, var(--cream-2), var(--paper));
     border-radius:18px; overflow:hidden;
+    touch-action:manipulation;
   }
   .game-hud{
     position:absolute; top:0; left:0; right:0; z-index:2;
@@ -470,8 +482,12 @@
     padding:0.7rem 1rem; font-weight:700; font-size:0.85rem; color:var(--berry-deep);
   }
   .falling-heart{
-    position:absolute; top:-40px; font-size:1.8rem; line-height:1;
+    position:absolute; top:-44px;
+    width:48px; height:48px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.8rem; line-height:1;
     cursor:pointer; user-select:none; animation:fall linear forwards;
+    touch-action:manipulation; -webkit-tap-highlight-color:transparent;
   }
   @keyframes fall{ from{ transform:translateY(0); } to{ transform:translateY(380px); } }
   .game-start-btn{
@@ -528,7 +544,7 @@
   .candle{
     position:relative; width:14px; height:70px;
     background:repeating-linear-gradient(45deg, var(--berry), var(--berry) 6px, #fff 6px, #fff 12px);
-    border-radius:4px; cursor:pointer;
+    border-radius:4px;
   }
   .flame{
     position:absolute; top:-26px; left:50%; transform:translateX(-50%);
@@ -543,13 +559,6 @@
     100%{ transform:translateX(-50%) scale(1.08) rotate(2deg); }
   }
   .candle.blown .flame{ opacity:0; transform:translateX(-50%) scale(0.4); }
-  .wish-btn{
-    font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:0.95rem;
-    background:var(--ink); color:var(--cream); border:none;
-    padding:0.9rem 1.8rem; border-radius:999px; cursor:pointer; box-shadow:var(--shadow);
-    transition:transform 0.2s ease, background 0.2s ease;
-  }
-  .wish-btn:hover{ transform:translateY(-3px); background:var(--berry-deep); }
   .wish-reveal{
     margin-top:1.6rem; font-family:'Fraunces', serif; font-style:italic; font-size:1.2rem;
     color:var(--berry-deep); max-width:480px; margin-left:auto; margin-right:auto;
@@ -581,6 +590,8 @@
 
 <canvas id="ambient-canvas"></canvas>
 <canvas id="confetti-canvas"></canvas>
+
+<button class="music-toggle" id="musicToggle" title="Play the happy birthday tune">🎵</button>
 
 <!-- ================= INTRO SEQUENCE ================= -->
 <div id="intro">
@@ -772,8 +783,6 @@
   </div>
   <button class="mic-btn reveal" id="micBtn">🎤 Blow into your mic</button>
   <div class="mic-status" id="micStatus"></div>
-  <div style="height:0.6rem;"></div>
-  <button class="wish-btn reveal" id="wishBtn">...or tap to blow out & make a wish</button>
   <div class="wish-reveal" id="wishReveal">Whatever you wished for — I hope I get to be part of it.</div>
   <div style="height:2.5rem;"></div>
 </section>
@@ -834,7 +843,64 @@
     introEl.classList.add('hidden');
     body.classList.remove('locked');
     burstConfetti(70);
+    playTune();
   });
+
+  /* ================= HAPPY BIRTHDAY TUNE (synthesized, no audio file needed) ================= */
+  var musicToggle = document.getElementById('musicToggle');
+  var musicPlaying = false;
+  var activeOscillators = [];
+  var tuneAudioCtx = null;
+
+  // [frequency Hz, duration in beats]
+  var HB_NOTES = [
+    [261.63,0.5],[261.63,0.5],[293.66,1],[261.63,1],[349.23,1],[329.63,2],
+    [261.63,0.5],[261.63,0.5],[293.66,1],[261.63,1],[392.00,1],[349.23,2],
+    [261.63,0.5],[261.63,0.5],[523.25,1],[440.00,1],[349.23,1],[329.63,1],[293.66,2],
+    [466.16,0.5],[466.16,0.5],[440.00,1],[349.23,1],[392.00,1],[349.23,2]
+  ];
+  var BEAT = 0.34;
+
+  function stopTune(){
+    activeOscillators.forEach(function(o){ try{ o.stop(); }catch(e){} });
+    activeOscillators = [];
+    if(tuneAudioCtx){ tuneAudioCtx.close(); tuneAudioCtx = null; }
+    musicPlaying = false;
+    musicToggle.textContent = '🎵';
+    musicToggle.classList.remove('playing');
+  }
+
+  function playTune(){
+    if(musicPlaying){ stopTune(); return; }
+    var AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(!AudioCtx) return;
+    tuneAudioCtx = new AudioCtx();
+    musicPlaying = true;
+    musicToggle.textContent = '🔇';
+    musicToggle.classList.add('playing');
+
+    var t = tuneAudioCtx.currentTime + 0.05;
+    HB_NOTES.forEach(function(n){
+      var freq = n[0], dur = n[1]*BEAT;
+      var osc = tuneAudioCtx.createOscillator();
+      var gain = tuneAudioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.exponentialRampToValueAtTime(0.3, t + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + dur*0.92);
+      osc.connect(gain);
+      gain.connect(tuneAudioCtx.destination);
+      osc.start(t);
+      osc.stop(t + dur);
+      activeOscillators.push(osc);
+      t += dur;
+    });
+    var totalMs = (t - tuneAudioCtx.currentTime) * 1000;
+    setTimeout(function(){ if(musicPlaying){ stopTune(); } }, totalMs + 150);
+  }
+
+  musicToggle.addEventListener('click', playTune);
 
   /* ================= BIRTHDAY TARGET ================= */
   var target = new Date("2026-07-13T18:30:00Z");
@@ -977,7 +1043,6 @@
 
   /* ================= CANDLE ================= */
   var candle = document.getElementById('candle');
-  var wishBtn = document.getElementById('wishBtn');
   var wishReveal = document.getElementById('wishReveal');
   function blowOut(){
     if(candle.classList.contains('blown')) return;
@@ -985,8 +1050,6 @@
     wishReveal.classList.add('show');
     burstConfetti(90);
   }
-  candle.addEventListener('click', blowOut);
-  wishBtn.addEventListener('click', blowOut);
 
   /* ================= MIC BLOW DETECTION (iPhone microphone) ================= */
   var micBtn = document.getElementById('micBtn');
@@ -1003,7 +1066,7 @@
   micBtn.addEventListener('click', function(){
     if(candle.classList.contains('blown')) return;
     if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-      micStatus.textContent = "Mic access isn't available here — tap the button below instead.";
+      micStatus.textContent = "Mic access isn't available in this browser.";
       return;
     }
     micBtn.disabled = true;
@@ -1054,7 +1117,7 @@
       }
       checkVolume();
     }).catch(function(){
-      micStatus.textContent = "Couldn't access the mic — just tap the button below instead.";
+      micStatus.textContent = "Please refresh the page and allow microphone access to blow out the candle.";
       micBtn.disabled = false;
     });
   });
@@ -1128,10 +1191,13 @@
     el.className = 'falling-heart';
     el.textContent = heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
     var arenaWidth = heartArena.clientWidth;
-    el.style.left = (Math.random() * Math.max(arenaWidth - 36, 0)) + 'px';
+    el.style.left = (Math.random() * Math.max(arenaWidth - 48, 0)) + 'px';
     el.style.animationDuration = (2 + Math.random()*1.5) + 's';
-    el.addEventListener('click', function(){
-      if(!heartGameRunning) return;
+    var caught = false;
+    el.addEventListener('pointerdown', function(e){
+      if(!heartGameRunning || caught) return;
+      caught = true;
+      e.preventDefault();
       heartScore++;
       heartScoreEl.textContent = 'Score: ' + heartScore;
       el.remove();
