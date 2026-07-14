@@ -295,7 +295,6 @@
   }
   .music-toggle:hover{ transform:scale(1.08); }
   .music-toggle.playing{ animation:pulse-glow 1.6s ease-in-out infinite; }
-  .song-toggle{ right:4.3rem; }
 
   /* ---------- HEARTBEAT HOLD ---------- */
   .heartbeat-heart{
@@ -448,22 +447,14 @@
 
   /* ---------- GALLERY ---------- */
   #gallery{ background:var(--cream); }
-  .gallery-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; }
+  .gallery-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:1.75rem; }
   .photo-frame{
-    aspect-ratio:4/5; border-radius:18px;
-    background:linear-gradient(160deg, var(--gold), var(--coral));
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    color:#fff; box-shadow:var(--shadow); font-size:0.85rem; text-align:center;
-    padding:1rem; transition:transform 0.4s cubic-bezier(.2,.8,.2,1);
+    display:block; width:100%; height:auto;
+    border-radius:22px; box-shadow:var(--shadow);
+    background:var(--paper); padding:0.6rem;
+    transition:transform 0.4s cubic-bezier(.2,.8,.2,1);
   }
-  img.photo-frame{ padding:0; object-fit:cover; width:100%; }
-  .photo-frame:nth-child(2){ background:linear-gradient(160deg, var(--lime), #6EC6A3); }
-  .photo-frame:nth-child(3){ background:linear-gradient(160deg, var(--berry), var(--berry-deep)); }
-  .photo-frame:nth-child(4){ background:linear-gradient(160deg, #8FB8FF, var(--berry)); }
-  .photo-frame:nth-child(5){ background:linear-gradient(160deg, var(--gold), var(--berry-deep)); }
-  .photo-frame:hover{ transform:translateY(-8px) rotate(-1.5deg) scale(1.02); }
-  .photo-frame .icon{ font-size:2.2rem; margin-bottom:0.5rem; }
-  .photo-frame small{ opacity:0.85; margin-top:0.35rem; }
+  .photo-frame:hover{ transform:translateY(-8px) rotate(-1deg) scale(1.02); }
 
   /* ---------- QUIZ ---------- */
   #quiz{ background:var(--paper); }
@@ -579,6 +570,21 @@
   .game-card{ background:var(--paper); border-radius:24px; box-shadow:var(--shadow); padding:1.7rem; }
   .game-card h3{ font-family:'Fraunces', serif; font-size:1.2rem; margin:0 0 0.4rem; }
   .game-desc{ color:#5B3B4C; font-size:0.9rem; margin:0 0 0.2rem; }
+  .gallery-video{ width:100%; border-radius:14px; margin-top:0.6rem; display:block; background:#000; }
+
+  .video-modal{
+    position:fixed; inset:0; z-index:1850;
+    display:none; align-items:center; justify-content:center;
+    background:rgba(52,28,43,0.72);
+    padding:1.5rem;
+  }
+  .video-modal.show{ display:flex; }
+  .video-modal-card{
+    background:var(--paper); border-radius:24px; box-shadow:var(--shadow);
+    padding:1.2rem; max-width:420px; width:100%;
+    animation:slice-pop 0.4s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .video-modal-close-btn{ width:100%; margin-top:1rem; }
 
   .heart-arena{
     position:relative; height:320px; margin-top:1rem;
@@ -774,8 +780,7 @@
 <canvas id="ambient-canvas"></canvas>
 <canvas id="confetti-canvas"></canvas>
 
-<button class="music-toggle" id="musicToggle" title="Play the happy birthday tune">🎵</button>
-<button class="music-toggle song-toggle" id="songToggle" title="Play/pause the background song">🎶</button>
+<button class="music-toggle" id="songToggle" title="Play/pause the background song">🎶</button>
 <!-- BACKGROUND SONG: drop a file named background-song.mp3 (or .m4a) next to this HTML file -->
 <audio id="bgSong" loop preload="none">
   <source src="background-song.mp3" type="audio/mpeg">
@@ -793,6 +798,17 @@
     <div class="cake-slice-visual"></div>
     <div class="cake-slice-msg">A slice, just for you 🍰❤️</div>
     <button class="cake-slice-close-btn" id="cakeSliceCloseBtn">Enjoy 🍴</button>
+  </div>
+</div>
+
+<!-- VIDEO: opens automatically once she successfully shakes the phone -->
+<div class="video-modal" id="videoModal">
+  <div class="video-modal-card">
+    <video class="gallery-video" id="secretVideo" controls playsinline muted preload="none">
+      <source src="IMG_0092.mov">
+      Your browser doesn't support this video format.
+    </video>
+    <button class="quiz-restart video-modal-close-btn" id="videoModalCloseBtn">Close</button>
   </div>
 </div>
 
@@ -905,7 +921,21 @@
   </div>
 
   <div class="game-grid reveal-stagger reveal">
-    <!-- GAME 1: Catch the Hearts -->
+    <!-- GAME 1: Shake for a Secret (uses iPhone motion sensors) -->
+    <div class="game-card stagger-item">
+      <h3>Shake for a Secret 📱</h3>
+      <p class="game-desc">Give your phone a little shake to unlock a hidden note.</p>
+      <div class="shake-box">
+        <div class="shake-icon" id="shakeIcon">🤫</div>
+        <button class="mic-btn" id="shakeEnableBtn">Enable & shake</button>
+        <div class="mic-status" id="shakeStatus"></div>
+        <!-- SHAKE SECRET: edit this hidden message -->
+        <div class="shake-secret-msg" id="shakeSecretMsg">Placeholder: here's a secret I've never told you...</div>
+        <button class="quiz-restart shake-replay-btn" id="shakeReplayBtn">Play again</button>
+      </div>
+    </div>
+
+    <!-- GAME 2: Catch the Hearts -->
     <div class="game-card stagger-item">
       <h3>Catch the Hearts 💕</h3>
       <p class="game-desc">15 seconds, fast hearts. Tap the pink ones, avoid the broken 💔 ones (they cost you).</p>
@@ -921,20 +951,6 @@
           <p id="heartResultMsg"></p>
           <button class="quiz-restart" id="heartReplayBtn">Play again</button>
         </div>
-      </div>
-    </div>
-
-    <!-- GAME 2: Shake for a Secret (uses iPhone motion sensors) -->
-    <div class="game-card stagger-item">
-      <h3>Shake for a Secret 📱</h3>
-      <p class="game-desc">Give your phone a little shake to unlock a hidden note.</p>
-      <div class="shake-box">
-        <div class="shake-icon" id="shakeIcon">🤫</div>
-        <button class="mic-btn" id="shakeEnableBtn">Enable & shake</button>
-        <div class="mic-status" id="shakeStatus"></div>
-        <!-- SHAKE SECRET: edit this hidden message -->
-        <div class="shake-secret-msg" id="shakeSecretMsg">Placeholder: here's a secret I've never told you...</div>
-        <button class="quiz-restart shake-replay-btn" id="shakeReplayBtn">Play again</button>
       </div>
     </div>
   </div>
@@ -1012,7 +1028,6 @@
     clearTimeout(seqTimer);
     introEl.classList.add('hidden');
     burstConfetti(70);
-    playTune();
     startSlides();
     startBackgroundSong();
   });
@@ -1050,62 +1065,6 @@
       songToggle.classList.remove('playing');
     }
   });
-
-  /* ================= HAPPY BIRTHDAY TUNE (synthesized, no audio file needed) ================= */
-  var musicToggle = document.getElementById('musicToggle');
-  var musicPlaying = false;
-  var activeOscillators = [];
-  var tuneAudioCtx = null;
-
-  // [frequency Hz, duration in beats]
-  var HB_NOTES = [
-    [261.63,0.5],[261.63,0.5],[293.66,1],[261.63,1],[349.23,1],[329.63,2],
-    [261.63,0.5],[261.63,0.5],[293.66,1],[261.63,1],[392.00,1],[349.23,2],
-    [261.63,0.5],[261.63,0.5],[523.25,1],[440.00,1],[349.23,1],[329.63,1],[293.66,2],
-    [466.16,0.5],[466.16,0.5],[440.00,1],[349.23,1],[392.00,1],[349.23,2]
-  ];
-  var BEAT = 0.34;
-
-  function stopTune(){
-    activeOscillators.forEach(function(o){ try{ o.stop(); }catch(e){} });
-    activeOscillators = [];
-    if(tuneAudioCtx){ tuneAudioCtx.close(); tuneAudioCtx = null; }
-    musicPlaying = false;
-    musicToggle.textContent = '🎵';
-    musicToggle.classList.remove('playing');
-  }
-
-  function playTune(){
-    if(musicPlaying){ stopTune(); return; }
-    var AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if(!AudioCtx) return;
-    tuneAudioCtx = new AudioCtx();
-    musicPlaying = true;
-    musicToggle.textContent = '🔇';
-    musicToggle.classList.add('playing');
-
-    var t = tuneAudioCtx.currentTime + 0.05;
-    HB_NOTES.forEach(function(n){
-      var freq = n[0], dur = n[1]*BEAT;
-      var osc = tuneAudioCtx.createOscillator();
-      var gain = tuneAudioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.0001, t);
-      gain.gain.exponentialRampToValueAtTime(0.3, t + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + dur*0.92);
-      osc.connect(gain);
-      gain.connect(tuneAudioCtx.destination);
-      osc.start(t);
-      osc.stop(t + dur);
-      activeOscillators.push(osc);
-      t += dur;
-    });
-    var totalMs = (t - tuneAudioCtx.currentTime) * 1000;
-    setTimeout(function(){ if(musicPlaying){ stopTune(); } }, totalMs + 150);
-  }
-
-  musicToggle.addEventListener('click', playTune);
 
   /* ================= TIME-BASED GREETING ================= */
   var timeGreetingEl = document.getElementById('timeGreeting');
@@ -1631,6 +1590,7 @@
         shakeStatus.textContent = '';
         shakeSecretMsg.classList.add('show');
         burstConfetti(60);
+        openSecretVideo();
       } else {
         shakeStatus.textContent = 'Keep shaking... ' + shakeHits.length + '/' + REQUIRED_SHAKES;
       }
@@ -1686,7 +1646,29 @@
     shakeIcon.textContent = '🤫';
     shakeStatus.textContent = '';
     shakeSecretMsg.classList.remove('show');
+    closeSecretVideo();
   });
+
+  /* ================= SECRET VIDEO (opens after a successful shake) ================= */
+  var videoModal = document.getElementById('videoModal');
+  var secretVideo = document.getElementById('secretVideo');
+  var videoModalCloseBtn = document.getElementById('videoModalCloseBtn');
+  secretVideo.muted = true;
+  secretVideo.volume = 0;
+
+  function openSecretVideo(){
+    videoModal.classList.add('show');
+    secretVideo.muted = true;
+    secretVideo.volume = 0;
+    secretVideo.currentTime = 0;
+    var playPromise = secretVideo.play();
+    if(playPromise && playPromise.catch){ playPromise.catch(function(){}); }
+  }
+  function closeSecretVideo(){
+    videoModal.classList.remove('show');
+    secretVideo.pause();
+  }
+  videoModalCloseBtn.addEventListener('click', closeSecretVideo);
 
   /* ================= CATCH THE HEARTS GAME ================= */
   var heartArena = document.getElementById('heartArena');
