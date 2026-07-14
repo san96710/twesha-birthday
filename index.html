@@ -804,8 +804,8 @@
   @media (prefers-reduced-motion: reduce){
     *{ animation:none !important; transition:none !important; }
     .reveal, .stagger-item{ opacity:1 !important; transform:none !important; }
-    .intro-title .letter, .intro-emoji-row{ opacity:1 !important; transform:none !important; }
-    .intro-title-row-shimmer{ color:var(--cream) !important; -webkit-text-fill-color:var(--cream) !important; }
+    .intro-title .letter, .intro-emoji-row, .intro-title-row-shimmer{ opacity:1 !important; transform:none !important; }
+    .intro-title-row-shimmer{ color:var(--cream) !important; -webkit-text-fill-color:var(--cream) !important; background:none !important; }
   }
 </style>
 </head>
@@ -1061,11 +1061,11 @@
     });
     return text.length;
   }
-  var introRow1 = document.getElementById('introRow1');
+  // introRow1 ("Happy Birthday") stays as plain text — it needs its text intact
+  // for the background-clip:text gradient shimmer to work — and just fades/slides
+  // in as a whole via CSS. introRow2 (her name) still flies in letter by letter.
   var introRow2 = document.getElementById('introRow2');
-  var row1Delay = 0.3;
-  var row1Len = splitIntroLetters(introRow1, row1Delay);
-  var row2Delay = row1Delay + row1Len * 0.04 + 0.25;
+  var row2Delay = 1.0; // matches introRow1's CSS fade-in (0.3s delay + 0.7s duration)
   var row2Len = splitIntroLetters(introRow2, row2Delay);
   var introRevealMs = introReduceMotion ? 0 : (row2Delay + row2Len * 0.04 + 0.6) * 1000;
 
