@@ -211,6 +211,49 @@
   .code-gate.unlocked .code-form{ display:none; }
   .letter-locked-note{ font-size:0.85rem; color:rgba(255,243,237,0.7); margin-top:1rem; }
 
+  /* ---------- ENVELOPE OPENING ANIMATION ---------- */
+  .envelope-anim{
+    display:none;
+    flex-direction:column; align-items:center; justify-content:center;
+    padding:3rem 0;
+  }
+  .envelope-anim.show{ display:flex; }
+  .envelope{ position:relative; width:190px; height:126px; perspective:700px; }
+  .envelope-body{
+    position:absolute; inset:0; z-index:2;
+    background:linear-gradient(160deg, var(--berry), var(--berry-deep));
+    border-radius:10px; box-shadow:var(--shadow);
+  }
+  .envelope-letter-card{
+    position:absolute; left:50%; bottom:14px; z-index:1;
+    width:150px; height:96px; margin-left:-75px;
+    background:var(--paper); border-radius:6px; box-shadow:0 6px 14px rgba(0,0,0,0.35);
+    opacity:0;
+    animation:envelope-letter-rise 0.9s cubic-bezier(.2,.8,.2,1) 1.15s forwards;
+  }
+  @keyframes envelope-letter-rise{
+    0%{ opacity:0; transform:translateY(0) scale(0.82); }
+    55%{ opacity:1; }
+    100%{ opacity:1; transform:translateY(-118px) scale(1.04); }
+  }
+  .envelope-flap{
+    position:absolute; top:0; left:0; z-index:3;
+    width:100%; height:66px;
+    background:linear-gradient(160deg, var(--coral), var(--berry));
+    clip-path:polygon(0 0, 100% 0, 50% 100%);
+    transform-origin:top center;
+    border-radius:10px 10px 0 0;
+    display:flex; align-items:flex-start; justify-content:center; padding-top:6px;
+    animation:envelope-flap-open 0.9s ease-in-out 0.35s forwards;
+    backface-visibility:hidden;
+  }
+  @keyframes envelope-flap-open{ to{ transform:rotateX(180deg); } }
+  .envelope-heart{
+    font-size:1.3rem;
+    animation:envelope-heart-fade 0.35s ease 0.35s forwards;
+  }
+  @keyframes envelope-heart-fade{ to{ opacity:0; } }
+
   /* ---------- CURSOR HEART TRAIL ---------- */
   .cursor-heart{
     position:fixed; z-index:1600; pointer-events:none;
@@ -1053,6 +1096,13 @@
       <button class="code-hint-ask-btn" id="codeHintAskBtn" style="display:none;">Need a hint?</button>
       <div class="code-hint" id="codeHint" style="display:none;">Hint: our birthdays...</div>
     </div>
+    <div class="envelope-anim" id="envelopeAnim">
+      <div class="envelope">
+        <div class="envelope-letter-card"></div>
+        <div class="envelope-body"></div>
+        <div class="envelope-flap"><span class="envelope-heart">❤️</span></div>
+      </div>
+    </div>
     <div class="code-unlocked-content" id="codeUnlockedContent" style="display:none;">
       <!-- FINAL LETTER: edit this paragraph -->
       <p>Twesha, it’s crazy that we haven’t even met once yet, but somehow it doesn’t feel like that at all. I know we’re both excited to meet very soon, and I’m sure it’s going to be just as fun as all our conversations have been, of course with a lot of excitement. Until then, enjoy your special day, smile a lot and have a blast. Happy Birthday ❤️</p>
@@ -1257,14 +1307,19 @@
   var codeHintAskBtn = document.getElementById('codeHintAskBtn');
   var codeHint = document.getElementById('codeHint');
   var codeUnlockedContent = document.getElementById('codeUnlockedContent');
+  var envelopeAnim = document.getElementById('envelopeAnim');
 
   function tryUnlockCode(){
     if(codeInput.value.trim() === UNLOCK_CODE){
       codeGate.classList.add('unlocked');
       codeForm.style.display = 'none';
-      codeUnlockedContent.style.display = '';
       burstConfetti(100);
       if(navigator.vibrate){ try{ navigator.vibrate([20,40,20,40,100]); }catch(e){} }
+      envelopeAnim.classList.add('show');
+      setTimeout(function(){
+        envelopeAnim.classList.remove('show');
+        codeUnlockedContent.style.display = '';
+      }, 2200);
     } else {
       wrongCodeAttempts++;
       codeError.textContent = "That's not quite it — try again.";
@@ -1821,8 +1876,8 @@
     secretVideo.muted = true;
     secretVideo.volume = 0;
     secretVideo.currentTime = 0;
-    // Browsers reject autoplay triggered from a devicemotion handler (it's not
-    // a real user gesture), so she taps the video's own native play button.
+    var playPromise = secretVideo.play();
+    if(playPromise && playPromise.catch){ playPromise.catch(function(){}); }
   }
   function closeSecretVideo(){
     videoModal.classList.remove('show');
