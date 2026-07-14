@@ -47,6 +47,8 @@
     --paper:#FFFDFB;
     --shadow: 0 20px 40px -20px rgba(52,28,43,0.35);
     --radius: 22px;
+    /* HERO BACKGROUND IMAGE: swap this filename for any image dropped in this folder */
+    --hero-bg-image: url('b35cb052-fc5b-4cc6-8488-308626772d9e.JPG');
   }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
@@ -115,6 +117,88 @@
   .stagger-item:nth-child(3){ transition-delay:0.25s; }
   .stagger-item:nth-child(4){ transition-delay:0.35s; }
   .stagger-item:nth-child(5){ transition-delay:0.45s; }
+
+  /* ---------- SLIDES / PAGINATION ---------- */
+  .slide{
+    position:fixed; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    overflow-y:auto;
+    padding:5.5rem 1.5rem 6.5rem;
+    opacity:0; visibility:hidden; pointer-events:none;
+    transition:opacity 0.5s ease;
+    z-index:5;
+  }
+  .slide > *{ max-width:980px; width:100%; margin-left:auto; margin-right:auto; }
+  .slide > button{ width:auto; max-width:none; align-self:center; }
+  .slide.active{ opacity:1; visibility:visible; pointer-events:auto; z-index:6; }
+
+  .slide-nav{
+    position:fixed; left:50%; bottom:1.3rem; transform:translateX(-50%);
+    z-index:1500; display:flex; align-items:center; gap:1rem;
+    background:var(--paper); border:1px solid rgba(214,51,108,0.18);
+    padding:0.6rem 1rem; border-radius:999px; box-shadow:var(--shadow);
+  }
+  .slide-nav-btn{
+    width:34px; height:34px; border-radius:50%; border:none; cursor:pointer;
+    background:var(--ink); color:var(--cream); font-size:1.1rem; line-height:1;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    transition:background 0.2s ease, opacity 0.2s ease;
+  }
+  .slide-nav-btn:hover{ background:var(--berry-deep); }
+  .slide-nav-btn:disabled{ opacity:0.3; cursor:default; }
+  .slide-dots{ display:flex; gap:6px; flex-wrap:wrap; max-width:140px; justify-content:center; }
+  .slide-dot{
+    width:7px; height:7px; border-radius:50%; border:none; padding:0; cursor:pointer;
+    background:rgba(214,51,108,0.25); transition:background 0.3s ease, transform 0.3s ease;
+  }
+  .slide-dot.active{ background:var(--berry-deep); transform:scale(1.35); }
+
+  /* ---------- COMPLIMENT GENERATOR ---------- */
+  #compliment{ background:var(--cream); }
+  .compliment-card{
+    background:var(--paper); border-radius:28px; box-shadow:var(--shadow);
+    padding:2.5rem 2rem; text-align:center; max-width:560px;
+  }
+  .compliment-text{
+    font-family:'Fraunces', serif; font-style:italic; font-size:1.4rem;
+    color:var(--berry-deep); min-height:3.2em; display:flex; align-items:center; justify-content:center;
+  }
+  .compliment-btn{
+    margin-top:1.5rem;
+    font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:0.95rem;
+    background:var(--ink); color:var(--cream); border:none;
+    padding:0.9rem 1.8rem; border-radius:999px; cursor:pointer; box-shadow:var(--shadow);
+    transition:transform 0.2s ease, background 0.2s ease;
+  }
+  .compliment-btn:hover{ transform:translateY(-3px); background:var(--berry-deep); }
+
+  /* ---------- FINAL CODE GATE ---------- */
+  .code-gate input{
+    font-family:'Plus Jakarta Sans', sans-serif; font-size:1.3rem; letter-spacing:0.3em;
+    text-align:center; width:140px; padding:0.7rem 0.5rem; border-radius:14px;
+    border:2px solid rgba(214,51,108,0.3); margin:1.2rem 0.6rem 0.4rem;
+    background:var(--paper); color:var(--ink);
+  }
+  .code-submit-btn{
+    font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:0.9rem;
+    background:var(--berry); color:#fff; border:none;
+    padding:0.75rem 1.5rem; border-radius:999px; cursor:pointer; box-shadow:var(--shadow);
+  }
+  .code-hint{ font-size:0.8rem; color:#8A6172; margin-top:0.8rem; }
+  .code-error{ color:var(--coral); font-weight:700; font-size:0.9rem; min-height:1.3em; margin-top:0.6rem; }
+  .code-gate.unlocked .code-form{ display:none; }
+  .letter-locked-note{ font-size:0.85rem; color:rgba(255,243,237,0.7); margin-top:1rem; }
+
+  /* ---------- CURSOR HEART TRAIL ---------- */
+  .cursor-heart{
+    position:fixed; z-index:1600; pointer-events:none;
+    font-size:1rem; opacity:0.9;
+    animation:cursor-heart-fade 0.9s ease-out forwards;
+  }
+  @keyframes cursor-heart-fade{
+    0%{ transform:translate(-50%,-50%) scale(0.6); opacity:0.9; }
+    100%{ transform:translate(-50%,-120%) scale(1.3); opacity:0; }
+  }
 
   /* ---------- INTRO / OPENING SEQUENCE ---------- */
   #intro{
@@ -216,10 +300,16 @@
     padding-top:4rem;
     padding-bottom:4rem;
     background:
-      radial-gradient(circle at 15% 20%, rgba(255,201,77,0.35), transparent 45%),
-      radial-gradient(circle at 85% 75%, rgba(183,227,138,0.35), transparent 45%),
-      linear-gradient(180deg, var(--cream) 0%, var(--cream-2) 100%);
+      radial-gradient(circle at 15% 20%, rgba(255,201,77,0.28), transparent 45%),
+      radial-gradient(circle at 85% 75%, rgba(183,227,138,0.28), transparent 45%),
+      linear-gradient(180deg, rgba(255,243,237,0.82) 0%, rgba(255,232,222,0.88) 100%),
+      var(--hero-bg-image) center/cover no-repeat,
+      var(--cream);
     overflow:hidden;
+  }
+  .time-greeting{
+    font-family:'Fraunces', serif; font-style:italic; font-size:1.05rem;
+    color:var(--berry-deep); margin-top:0.4rem;
   }
   .hero-badge{
     display:inline-flex;
@@ -296,6 +386,11 @@
     letter-spacing:0.1em;
     text-transform:uppercase;
     color:#8A6172;
+    background:none;
+    border:none;
+    font-family:'Plus Jakarta Sans', sans-serif;
+    font-weight:700;
+    cursor:pointer;
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -313,7 +408,7 @@
   .section-head p{ color:#5B3B4C; max-width:480px; margin:0.9rem auto 0; }
 
   /* ---------- REP CARDS ---------- */
-  #notes{ background:var(--paper); position:relative; z-index:2; }
+  #notes{ background:var(--paper); }
   .rep-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:1.3rem; }
   .rep-card{ perspective:1200px; height:230px; cursor:pointer; }
   .rep-card-inner{
@@ -339,7 +434,7 @@
   }
 
   /* ---------- GALLERY ---------- */
-  #gallery{ background:var(--cream); position:relative; z-index:2; }
+  #gallery{ background:var(--cream); }
   .gallery-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; }
   .photo-frame{
     aspect-ratio:4/5; border-radius:18px;
@@ -356,7 +451,7 @@
   .photo-frame small{ opacity:0.85; margin-top:0.35rem; }
 
   /* ---------- QUIZ ---------- */
-  #quiz{ background:var(--paper); position:relative; z-index:2; }
+  #quiz{ background:var(--paper); }
   .quiz-card{
     background:var(--cream);
     border-radius:24px;
@@ -464,7 +559,7 @@
   }
 
   /* ---------- MINI GAMES ---------- */
-  #games{ background:var(--cream); position:relative; z-index:2; }
+  #games{ background:var(--cream); }
   .game-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.5rem; }
   .game-card{ background:var(--paper); border-radius:24px; box-shadow:var(--shadow); padding:1.7rem; }
   .game-card h3{ font-family:'Fraunces', serif; font-size:1.2rem; margin:0 0 0.4rem; }
@@ -521,6 +616,8 @@
     transition:opacity 0.6s ease, transform 0.6s ease;
   }
   .shake-secret-msg.show{ opacity:1; transform:translateY(0); }
+  .shake-replay-btn{ display:none; margin-top:1rem; }
+  .shake-secret-msg.show ~ .shake-replay-btn{ display:inline-block; }
 
   .mic-btn{
     font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:0.9rem;
@@ -576,6 +673,8 @@
     opacity:0; transform:translateY(8px); transition:opacity 0.6s ease, transform 0.6s ease;
   }
   .wish-reveal.show{ opacity:1; transform:translateY(0); }
+  .candle-replay-btn{ display:none; margin-top:1.4rem; }
+  .wish-reveal.show ~ .candle-replay-btn{ display:inline-block; }
 
   /* ---------- FINAL LETTER ---------- */
   #letter{ text-align:center; z-index:2; }
@@ -604,6 +703,12 @@
 
 <button class="music-toggle" id="musicToggle" title="Play the happy birthday tune">🎵</button>
 
+<div class="slide-nav" id="slideNav" style="display:none;">
+  <button class="slide-nav-btn" id="prevSlideBtn" aria-label="Previous">‹</button>
+  <div class="slide-dots" id="slideDots"></div>
+  <button class="slide-nav-btn" id="nextSlideBtn" aria-label="Next">›</button>
+</div>
+
 <!-- ================= INTRO SEQUENCE ================= -->
 <div id="intro">
   <div class="intro-line" data-line="0">For someone who never skips leg day,</div>
@@ -615,21 +720,35 @@
 </div>
 
 <!-- ================= HERO ================= -->
-<section id="hero">
+<section id="hero" class="slide">
   <div class="hero-badge reveal">🎂 A little something from your person</div>
   <h1 class="hero-title reveal"><span>Happy Birthday</span><em>Twesha</em></h1>
   <p class="hero-sub reveal">Kind, gorgeous, and the owner of a smile that ends arguments before they start. Today is entirely about you.</p>
+  <div class="time-greeting reveal" id="timeGreeting"></div>
 
   <div id="status-panel" class="reveal"></div>
 
-  <div class="scroll-cue reveal">
-    <span>scroll for your surprise</span>
+  <button class="scroll-cue reveal" id="heroNextBtn" type="button">
+    <span>tap for your surprise</span>
     <span>↓</span>
+  </button>
+</section>
+
+<!-- ================= COMPLIMENT GENERATOR ================= -->
+<section id="compliment" class="slide">
+  <div class="section-head reveal">
+    <div class="eyebrow">Whenever you need it</div>
+    <h2>Tell Me Something</h2>
+    <p>Tap the button for a random reason I'm obsessed with you.</p>
+  </div>
+  <div class="compliment-card reveal">
+    <div class="compliment-text" id="complimentText">Tap below to find out ❤️</div>
+    <button class="compliment-btn" id="complimentBtn">Tell me something ❤️</button>
   </div>
 </section>
 
 <!-- ================= LOVE NOTES ================= -->
-<section id="notes">
+<section id="notes" class="slide">
   <div class="section-head reveal">
     <div class="eyebrow">Today's Set</div>
     <h2>5 Reasons, 5 Reps</h2>
@@ -696,7 +815,7 @@
 </section>
 
 <!-- ================= GALLERY ================= -->
-<section id="gallery">
+<section id="gallery" class="slide">
   <div class="section-head reveal">
     <div class="eyebrow">Our Story</div>
     <h2>A Few of My Favorite Moments</h2>
@@ -712,7 +831,7 @@
 </section>
 
 <!-- ================= QUIZ CHALLENGE ================= -->
-<section id="quiz">
+<section id="quiz" class="slide">
   <div class="section-head reveal">
     <div class="eyebrow">Challenge time</div>
     <h2>How Well Do You Know Us?</h2>
@@ -740,7 +859,7 @@
 </section>
 
 <!-- ================= MINI GAMES ================= -->
-<section id="games">
+<section id="games" class="slide">
   <div class="section-head reveal">
     <div class="eyebrow">Just for fun</div>
     <h2>A Couple of Games</h2>
@@ -777,13 +896,14 @@
         <div class="mic-status" id="shakeStatus"></div>
         <!-- SHAKE SECRET: edit this hidden message -->
         <div class="shake-secret-msg" id="shakeSecretMsg">Placeholder: here's a secret I've never told you...</div>
+        <button class="quiz-restart shake-replay-btn" id="shakeReplayBtn">Play again</button>
       </div>
     </div>
   </div>
 </section>
 
 <!-- ================= WISH ================= -->
-<section id="wish">
+<section id="wish" class="slide">
   <div class="section-head reveal" style="margin-bottom:0;">
     <div class="eyebrow">Make a wish</div>
     <h2>Blow out the candle</h2>
@@ -797,19 +917,30 @@
   <button class="mic-btn reveal" id="micBtn">🎤 Blow into your mic</button>
   <div class="mic-status" id="micStatus"></div>
   <div class="wish-reveal" id="wishReveal">Whatever you wished for — I hope I get to be part of it.</div>
+  <button class="quiz-restart candle-replay-btn" id="candleReplayBtn">Light it again</button>
   <div style="height:2.5rem;"></div>
 </section>
 
-<!-- ================= FINAL LETTER ================= -->
-<section id="letter">
-  <div class="letter-card reveal">
-    <!-- FINAL LETTER: edit this paragraph -->
-    <p>Twesha, another year of you is exactly what the world needed. Here's to more workouts you drag me to, more of that laugh I'll never get tired of, and more of everything, with you. Happy Birthday.</p>
-    <div class="signature">— always yours</div>
+<!-- ================= FINAL LETTER (code-gated) ================= -->
+<section id="letter" class="slide">
+  <div class="letter-card reveal code-gate" id="codeGate">
+    <div class="code-form" id="codeForm">
+      <div class="eyebrow" style="color:var(--gold);">One last thing</div>
+      <h2 style="color:var(--cream); margin-top:0.5rem;">Enter the code to unlock this</h2>
+      <p style="color:rgba(255,243,237,0.8); max-width:420px; margin:0.8rem auto 0;">Four digits. Think about what today means to us.</p>
+      <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="codeInput" placeholder="••••">
+      <div><button class="code-submit-btn" id="codeSubmitBtn">Unlock</button></div>
+      <div class="code-error" id="codeError"></div>
+      <div class="code-hint">Hint: our two birthdays, MMDD.</div>
+    </div>
+    <div class="code-unlocked-content" id="codeUnlockedContent" style="display:none;">
+      <!-- FINAL LETTER: edit this paragraph -->
+      <p>Twesha, another year of you is exactly what the world needed. Here's to more workouts you drag me to, more of that laugh I'll never get tired of, and more of everything, with you. Happy Birthday.</p>
+      <div class="signature">— always yours</div>
+      <div class="letter-locked-note">made with love, hosted just for you 💌</div>
+    </div>
   </div>
 </section>
-
-<footer>made with love, hosted just for you 💌</footer>
 
 <script>
 (function(){
@@ -861,9 +992,9 @@
   introBtn.addEventListener('click', function(){
     clearTimeout(seqTimer);
     introEl.classList.add('hidden');
-    body.classList.remove('locked');
     burstConfetti(70);
     playTune();
+    startSlides();
   });
 
   /* ================= HAPPY BIRTHDAY TUNE (synthesized, no audio file needed) ================= */
@@ -922,6 +1053,102 @@
 
   musicToggle.addEventListener('click', playTune);
 
+  /* ================= TIME-BASED GREETING ================= */
+  var timeGreetingEl = document.getElementById('timeGreeting');
+  (function renderTimeGreeting(){
+    var hour = new Date().getHours();
+    var msg;
+    if(hour < 12){ msg = 'Good morning, beautiful ☀️'; }
+    else if(hour < 18){ msg = 'Hope your day is going well ❤️'; }
+    else { msg = 'Sleep well tonight 🌙'; }
+    timeGreetingEl.textContent = msg;
+  })();
+
+  /* ================= COMPLIMENT GENERATOR ================= */
+  // COMPLIMENT LIST: add or edit freely, one shows per tap.
+  var compliments = [
+    "You make my worst days better.",
+    "You have the cutest laugh, and I mean that every time.",
+    "I still smile thinking about our conversations.",
+    "You're the most driven person I know.",
+    "Your hugs fix things words can't.",
+    "You make ordinary days feel like a good story.",
+    "I love how you never give up on the things that matter to you.",
+    "You're prettier than you think you are.",
+    "Talking to you is my favorite part of the day.",
+    "You make it so easy to be myself around you.",
+    "I love the way you get excited about small things.",
+    "You're stronger than you give yourself credit for.",
+    "Being around you feels like home.",
+    "You somehow make me want to be better, every day.",
+    "I love you more today than yesterday, and that's saying something."
+  ];
+  var complimentTextEl = document.getElementById('complimentText');
+  var complimentBtn = document.getElementById('complimentBtn');
+  var lastComplimentIndex = -1;
+  complimentBtn.addEventListener('click', function(){
+    var idx;
+    do { idx = Math.floor(Math.random() * compliments.length); } while(idx === lastComplimentIndex && compliments.length > 1);
+    lastComplimentIndex = idx;
+    complimentTextEl.style.opacity = '0';
+    setTimeout(function(){
+      complimentTextEl.textContent = compliments[idx];
+      complimentTextEl.style.transition = 'opacity 0.35s ease';
+      complimentTextEl.style.opacity = '1';
+    }, 180);
+  });
+
+  /* ================= FINAL CODE GATE ================= */
+  // CODE GATE: change '0714' below to whatever date/code you want.
+  var UNLOCK_CODE = '0714';
+  var codeGate = document.getElementById('codeGate');
+  var codeForm = document.getElementById('codeForm');
+  var codeInput = document.getElementById('codeInput');
+  var codeSubmitBtn = document.getElementById('codeSubmitBtn');
+  var codeError = document.getElementById('codeError');
+  var codeUnlockedContent = document.getElementById('codeUnlockedContent');
+
+  function tryUnlockCode(){
+    if(codeInput.value.trim() === UNLOCK_CODE){
+      codeGate.classList.add('unlocked');
+      codeForm.style.display = 'none';
+      codeUnlockedContent.style.display = '';
+      burstConfetti(100);
+    } else {
+      codeError.textContent = "That's not quite it — try again.";
+      codeInput.value = '';
+      codeInput.focus();
+    }
+  }
+  codeSubmitBtn.addEventListener('click', tryUnlockCode);
+  codeInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ tryUnlockCode(); }
+  });
+
+  /* ================= CURSOR HEART TRAIL ================= */
+  if(!reduceMotionQuery()){
+    var lastHeartTrailTime = 0;
+    function spawnCursorHeart(x, y){
+      var now = Date.now();
+      if(now - lastHeartTrailTime < 90) return;
+      lastHeartTrailTime = now;
+      var h = document.createElement('div');
+      h.className = 'cursor-heart';
+      h.textContent = '💗';
+      h.style.left = x + 'px';
+      h.style.top = y + 'px';
+      document.body.appendChild(h);
+      setTimeout(function(){ h.remove(); }, 900);
+    }
+    document.addEventListener('mousemove', function(e){ spawnCursorHeart(e.clientX, e.clientY); });
+    document.addEventListener('touchmove', function(e){
+      if(e.touches[0]){ spawnCursorHeart(e.touches[0].clientX, e.touches[0].clientY); }
+    }, { passive:true });
+  }
+  function reduceMotionQuery(){
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
   /* ================= BIRTHDAY TARGET ================= */
   var target = new Date("2026-07-13T18:30:00Z");
   var panel = document.getElementById('status-panel');
@@ -952,17 +1179,70 @@
   }, 1000);
   renderCountdown();
 
-  /* ================= SCROLL REVEAL ================= */
-  var revealEls = document.querySelectorAll('.reveal');
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      if(entry.isIntersecting){
-        entry.target.classList.add('visible');
-        io.unobserve(entry.target);
-      }
-    });
-  }, { threshold:0.15 });
-  revealEls.forEach(function(el){ io.observe(el); });
+  /* ================= SLIDES / PAGINATION (one screen at a time) ================= */
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var slideNav = document.getElementById('slideNav');
+  var prevSlideBtn = document.getElementById('prevSlideBtn');
+  var nextSlideBtn = document.getElementById('nextSlideBtn');
+  var slideDotsWrap = document.getElementById('slideDots');
+  var slideIndex = 0;
+
+  slides.forEach(function(_, i){
+    var dot = document.createElement('button');
+    dot.className = 'slide-dot';
+    dot.type = 'button';
+    dot.setAttribute('aria-label', 'Go to screen ' + (i+1));
+    dot.addEventListener('click', function(){ goToSlide(i); });
+    slideDotsWrap.appendChild(dot);
+  });
+  var slideDotEls = document.querySelectorAll('.slide-dot');
+
+  function revealSlideContent(slide){
+    slide.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('visible'); });
+  }
+
+  function goToSlide(i){
+    if(i < 0 || i >= slides.length) return;
+    slides[slideIndex].classList.remove('active');
+    slideIndex = i;
+    var target = slides[slideIndex];
+    target.classList.add('active');
+    target.scrollTop = 0;
+    revealSlideContent(target);
+    slideDotEls.forEach(function(d, idx){ d.classList.toggle('active', idx === slideIndex); });
+    prevSlideBtn.disabled = slideIndex === 0;
+    nextSlideBtn.disabled = slideIndex === slides.length - 1;
+  }
+
+  function startSlides(){
+    slideNav.style.display = 'flex';
+    goToSlide(0);
+  }
+
+  prevSlideBtn.addEventListener('click', function(){ goToSlide(slideIndex - 1); });
+  nextSlideBtn.addEventListener('click', function(){ goToSlide(slideIndex + 1); });
+  document.getElementById('heroNextBtn').addEventListener('click', function(){ goToSlide(slideIndex + 1); });
+
+  document.addEventListener('keydown', function(e){
+    if(introEl && !introEl.classList.contains('hidden')) return;
+    if(e.key === 'ArrowRight') goToSlide(slideIndex + 1);
+    if(e.key === 'ArrowLeft') goToSlide(slideIndex - 1);
+  });
+
+  var touchStartX = null, touchStartY = null;
+  document.addEventListener('touchstart', function(e){
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive:true });
+  document.addEventListener('touchend', function(e){
+    if(touchStartX === null) return;
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    touchStartX = null;
+    if(Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5){
+      if(dx < 0){ goToSlide(slideIndex + 1); } else { goToSlide(slideIndex - 1); }
+    }
+  }, { passive:true });
 
   /* ================= FLIP CARDS ================= */
   document.querySelectorAll('.rep-card').forEach(function(card){
@@ -1076,6 +1356,17 @@
     burstConfetti(90);
   }
 
+  var candleReplayBtn = document.getElementById('candleReplayBtn');
+  candleReplayBtn.addEventListener('click', function(){
+    candle.classList.remove('blown');
+    wishReveal.classList.remove('show');
+    flame.style.opacity = '';
+    flame.style.animationDuration = '';
+    blowMeterFill.style.width = '0%';
+    micStatus.textContent = '';
+    micBtn.disabled = false;
+  });
+
   /* ================= MIC BLOW DETECTION (iPhone microphone) ================= */
   var micBtn = document.getElementById('micBtn');
   var micStatus = document.getElementById('micStatus');
@@ -1097,16 +1388,30 @@
     micBtn.disabled = true;
     micStatus.textContent = 'Listening... blow toward your phone 🎤';
 
-    navigator.mediaDevices.getUserMedia({ audio:true }).then(function(stream){
+    // Browsers' noise suppression / auto gain control actively flattens breath
+    // and wind noise (it thinks it's background noise) — that's the usual reason
+    // a "blow into the mic" detector doesn't pick anything up. Ask for raw audio
+    // first, and fall back to a plain getUserMedia if the constraints are rejected.
+    var micConstraints = {
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false
+      }
+    };
+    navigator.mediaDevices.getUserMedia(micConstraints).catch(function(){
+      return navigator.mediaDevices.getUserMedia({ audio:true });
+    }).then(function(stream){
       micStream = stream;
       var AudioCtx = window.AudioContext || window.webkitAudioContext;
       var audioCtx = new AudioCtx();
+      if(audioCtx.state === 'suspended'){ audioCtx.resume(); }
       var source = audioCtx.createMediaStreamSource(stream);
       var analyser = audioCtx.createAnalyser();
       analyser.fftSize = 512;
       source.connect(analyser);
-      var data = new Uint8Array(analyser.frequencyBinCount);
-      var THRESHOLD = 55;
+      var data = new Uint8Array(analyser.fftSize);
+      var THRESHOLD = 36;
       var blowStrength = 0;
       var stopped = false;
 
@@ -1159,6 +1464,7 @@
   var shakeIcon = document.getElementById('shakeIcon');
   var shakeSecretMsg = document.getElementById('shakeSecretMsg');
   var shakeStatus = document.getElementById('shakeStatus');
+  var shakeReplayBtn = document.getElementById('shakeReplayBtn');
   var shakeUnlocked = false;
   var lastShakeCheck = 0;
   var lastX, lastY, lastZ;
@@ -1211,6 +1517,15 @@
     } else {
       shakeEnableBtn.textContent = 'Motion sensors not supported here';
     }
+  });
+
+  shakeReplayBtn.addEventListener('click', function(){
+    shakeUnlocked = false;
+    shakeHits = [];
+    lastX = lastY = lastZ = undefined;
+    shakeIcon.textContent = '🤫';
+    shakeStatus.textContent = '';
+    shakeSecretMsg.classList.remove('show');
   });
 
   /* ================= CATCH THE HEARTS GAME ================= */
