@@ -685,6 +685,12 @@
     animation:slice-pop 0.4s cubic-bezier(.2,.8,.2,1) both;
   }
   .video-modal-close-btn{ width:100%; margin-top:1rem; }
+  .video-wrap{ position:relative; }
+  .video-play-overlay{
+    position:absolute; inset:0; margin:auto; width:64px; height:64px;
+    border-radius:50%; border:none; background:rgba(0,0,0,0.55); color:#fff;
+    font-size:1.6rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
 
   .shake-box{ text-align:center; padding:0.6rem 0 0.2rem; }
   .shake-icon{ font-size:3rem; margin-bottom:0.8rem; animation:shake-wiggle 1.6s ease-in-out infinite; }
@@ -722,6 +728,16 @@
     height:100%; width:0%;
     background:linear-gradient(90deg, var(--berry), var(--coral));
     transition:width 0.08s linear;
+  }
+
+  .shake-meter{
+    width:180px; height:8px; margin:0.9rem auto 0.4rem;
+    background:rgba(214,51,108,0.15); border-radius:999px; overflow:hidden;
+  }
+  .shake-meter-fill{
+    height:100%; width:0%;
+    background:linear-gradient(90deg, var(--berry), var(--coral));
+    transition:width 0.25s ease;
   }
 
   /* ---------- CAKE + CANDLES + CUT ---------- */
@@ -868,13 +884,17 @@
   </div>
 </div>
 
-<!-- VIDEO: opens automatically once she successfully shakes the phone -->
+<!-- VIDEO: opens once she successfully shakes the phone; she taps play herself
+     (browsers block autoplay triggered from a motion-sensor event, not a real tap) -->
 <div class="video-modal" id="videoModal">
   <div class="video-modal-card">
-    <video class="gallery-video" id="secretVideo" controls playsinline muted preload="none">
-      <source src="IMG_0092.mov">
-      Your browser doesn't support this video format.
-    </video>
+    <div class="video-wrap">
+      <video class="gallery-video" id="secretVideo" controls playsinline muted preload="none">
+        <source src="IMG_0092.mov">
+        Your browser doesn't support this video format.
+      </video>
+      <button class="video-play-overlay" id="videoPlayOverlay" aria-label="Play video">▶</button>
+    </div>
     <button class="quiz-restart video-modal-close-btn" id="videoModalCloseBtn">Close</button>
   </div>
 </div>
@@ -1018,6 +1038,7 @@
       <div class="shake-box">
         <div class="shake-icon" id="shakeIcon">🤫</div>
         <button class="mic-btn" id="shakeEnableBtn">Enable & shake</button>
+        <div class="shake-meter" id="shakeMeter"><div class="shake-meter-fill" id="shakeMeterFill"></div></div>
         <div class="mic-status" id="shakeStatus"></div>
         <!-- SHAKE SECRET: edit this hidden message -->
         <div class="shake-secret-msg" id="shakeSecretMsg">Some precious happy moments!</div>
@@ -1173,12 +1194,29 @@
   ];
   var complimentTextEl = document.getElementById('complimentText');
   var complimentBtn = document.getElementById('complimentBtn');
-  var lastComplimentIndex = -1;
+  // Shuffle-bag: every compliment gets shown once before any repeat, then reshuffle.
+  var complimentBag = [];
+  function refillComplimentBag(avoidFirst){
+    var indices = compliments.map(function(_, i){ return i; });
+    // Fisher–Yates shuffle
+    for(var i = indices.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
+    }
+    // avoid the new bag's first card matching the very last one shown
+    if(avoidFirst !== undefined && indices.length > 1 && indices[0] === avoidFirst){
+      var swapAt = 1 + Math.floor(Math.random() * (indices.length - 1));
+      var t = indices[0]; indices[0] = indices[swapAt]; indices[swapAt] = t;
+    }
+    complimentBag = indices;
+  }
   complimentBtn.addEventListener('click', function(){
     if(navigator.vibrate){ try{ navigator.vibrate(15); }catch(e){} }
-    var idx;
-    do { idx = Math.floor(Math.random() * compliments.length); } while(idx === lastComplimentIndex && compliments.length > 1);
-    lastComplimentIndex = idx;
+    if(complimentBag.length === 0){
+      refillComplimentBag(complimentBag._last);
+    }
+    var idx = complimentBag.pop();
+    complimentBag._last = idx;
     complimentTextEl.style.opacity = '0';
     setTimeout(function(){
       complimentTextEl.textContent = compliments[idx];
@@ -1665,6 +1703,7 @@
   var shakeSecretMsg = document.getElementById('shakeSecretMsg');
   var shakeStatus = document.getElementById('shakeStatus');
   var shakeReplayBtn = document.getElementById('shakeReplayBtn');
+  var shakeMeterFill = document.getElementById('shakeMeterFill');
   var shakeUnlocked = false;
   var lastShakeCheck = 0;
   var lastX, lastY, lastZ;
@@ -1685,6 +1724,7 @@
     if(delta > SHAKE_THRESHOLD && !shakeUnlocked){
       shakeHits.push(now);
       shakeHits = shakeHits.filter(function(ts){ return now - ts <= SHAKE_WINDOW; });
+      shakeMeterFill.style.width = (Math.min(shakeHits.length, REQUIRED_SHAKES) / REQUIRED_SHAKES * 100) + '%';
       if(shakeHits.length >= REQUIRED_SHAKES){
         shakeUnlocked = true;
         shakeIcon.textContent = '💌';
@@ -1746,6 +1786,7 @@
     lastX = lastY = lastZ = undefined;
     shakeIcon.textContent = '🤫';
     shakeStatus.textContent = '';
+    shakeMeterFill.style.width = '0%';
     shakeSecretMsg.classList.remove('show');
     closeSecretVideo();
   });
@@ -1754,6 +1795,7 @@
   var videoModal = document.getElementById('videoModal');
   var secretVideo = document.getElementById('secretVideo');
   var videoModalCloseBtn = document.getElementById('videoModalCloseBtn');
+  var videoPlayOverlay = document.getElementById('videoPlayOverlay');
   secretVideo.muted = true;
   secretVideo.volume = 0;
 
@@ -1762,9 +1804,22 @@
     secretVideo.muted = true;
     secretVideo.volume = 0;
     secretVideo.currentTime = 0;
-    var playPromise = secretVideo.play();
-    if(playPromise && playPromise.catch){ playPromise.catch(function(){}); }
+    // Browsers reject autoplay triggered from a devicemotion handler (it's not
+    // a real user gesture) — show a play button and let her tap it herself.
+    videoPlayOverlay.style.display = 'flex';
   }
+  videoPlayOverlay.addEventListener('click', function(){
+    var playPromise = secretVideo.play();
+    if(playPromise && playPromise.then){
+      playPromise.then(function(){ videoPlayOverlay.style.display = 'none'; }).catch(function(){});
+    } else {
+      videoPlayOverlay.style.display = 'none';
+    }
+  });
+  secretVideo.addEventListener('play', function(){ videoPlayOverlay.style.display = 'none'; });
+  secretVideo.addEventListener('pause', function(){
+    if(videoModal.classList.contains('show')){ videoPlayOverlay.style.display = 'flex'; }
+  });
   function closeSecretVideo(){
     videoModal.classList.remove('show');
     secretVideo.pause();
