@@ -685,12 +685,6 @@
     animation:slice-pop 0.4s cubic-bezier(.2,.8,.2,1) both;
   }
   .video-modal-close-btn{ width:100%; margin-top:1rem; }
-  .video-wrap{ position:relative; }
-  .video-play-overlay{
-    position:absolute; inset:0; margin:auto; width:64px; height:64px;
-    border-radius:50%; border:none; background:rgba(0,0,0,0.55); color:#fff;
-    font-size:1.6rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
-  }
 
   .shake-box{ text-align:center; padding:0.6rem 0 0.2rem; }
   .shake-icon{ font-size:3rem; margin-bottom:0.8rem; animation:shake-wiggle 1.6s ease-in-out infinite; }
@@ -884,17 +878,14 @@
   </div>
 </div>
 
-<!-- VIDEO: opens once she successfully shakes the phone; she taps play herself
-     (browsers block autoplay triggered from a motion-sensor event, not a real tap) -->
+<!-- VIDEO: opens once she successfully shakes the phone; she taps the video's own
+     play button (browsers block autoplay triggered from a motion-sensor event) -->
 <div class="video-modal" id="videoModal">
   <div class="video-modal-card">
-    <div class="video-wrap">
-      <video class="gallery-video" id="secretVideo" controls playsinline muted preload="none">
-        <source src="IMG_0092.mov">
-        Your browser doesn't support this video format.
-      </video>
-      <button class="video-play-overlay" id="videoPlayOverlay" aria-label="Play video">▶</button>
-    </div>
+    <video class="gallery-video" id="secretVideo" controls playsinline muted preload="none">
+      <source src="IMG_0092.mov">
+      Your browser doesn't support this video format.
+    </video>
     <button class="quiz-restart video-modal-close-btn" id="videoModalCloseBtn">Close</button>
   </div>
 </div>
@@ -1019,6 +1010,7 @@
     <img class="photo-frame stagger-item" src="image4.jpg" alt="A favorite memory">
     <img class="photo-frame stagger-item" src="image5.jpg" alt="A favorite memory">
     <img class="photo-frame stagger-item" src="image6.jpg" alt="A favorite memory">
+    <img class="photo-frame stagger-item" src="image7.jpg" alt="A favorite memory">
   </div>
 </section>
 
@@ -1795,7 +1787,6 @@
   var videoModal = document.getElementById('videoModal');
   var secretVideo = document.getElementById('secretVideo');
   var videoModalCloseBtn = document.getElementById('videoModalCloseBtn');
-  var videoPlayOverlay = document.getElementById('videoPlayOverlay');
   secretVideo.muted = true;
   secretVideo.volume = 0;
 
@@ -1805,21 +1796,8 @@
     secretVideo.volume = 0;
     secretVideo.currentTime = 0;
     // Browsers reject autoplay triggered from a devicemotion handler (it's not
-    // a real user gesture) — show a play button and let her tap it herself.
-    videoPlayOverlay.style.display = 'flex';
+    // a real user gesture), so she taps the video's own native play button.
   }
-  videoPlayOverlay.addEventListener('click', function(){
-    var playPromise = secretVideo.play();
-    if(playPromise && playPromise.then){
-      playPromise.then(function(){ videoPlayOverlay.style.display = 'none'; }).catch(function(){});
-    } else {
-      videoPlayOverlay.style.display = 'none';
-    }
-  });
-  secretVideo.addEventListener('play', function(){ videoPlayOverlay.style.display = 'none'; });
-  secretVideo.addEventListener('pause', function(){
-    if(videoModal.classList.contains('show')){ videoPlayOverlay.style.display = 'flex'; }
-  });
   function closeSecretVideo(){
     videoModal.classList.remove('show');
     secretVideo.pause();
