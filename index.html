@@ -838,7 +838,7 @@
 
 <div class="heartbeat-overlay" id="heartbeatOverlay">
   <div class="big-heart">❤️</div>
-  <p id="heartbeatMsg">Every beat of this is for you.</p>
+  <p id="heartbeatMsg">HI TWESHA!!</p>
   <button class="heartbeat-close-btn" id="heartbeatCloseBtn">Close</button>
 </div>
 
@@ -900,7 +900,7 @@
   <div class="hero-content">
     <div class="hero-badge reveal">🎂 A little something from your person</div>
     <h1 class="hero-title reveal"><span>Happy Birthday</span><em>Twesha</em></h1>
-    <p class="hero-sub reveal">Kind, gorgeous, and the owner of a smile that ends arguments before they start. Today is entirely about you.</p>
+    <p class="hero-sub reveal">A kind heart, a beautiful soul, and an infectious smile that lights up every moment. Today is all about you.</p>
     <div class="time-greeting reveal" id="timeGreeting"></div>
 
     <div id="status-panel" class="reveal"></div>
@@ -909,7 +909,7 @@
     <div class="heartbeat-hint reveal">press and hold</div>
 
     <button class="scroll-cue reveal" id="heroNextBtn" type="button">
-      <span>tap for your surprise</span>
+      <span>Tap to see what's waiting for you 👀</span>
       <span>↓</span>
     </button>
   </div>
@@ -918,7 +918,7 @@
 <!-- ================= CAKE + CANDLES + CUT ================= -->
 <section id="cake" class="slide">
   <div class="section-head reveal" style="margin-bottom:1.2rem;">
-    <div class="eyebrow">Make a wish</div>
+    <div class="eyebrow">Time to make a birthday wish ✨</div>
     <h2>Blow out a candle, then cut the cake</h2>
     <p>One flame goes out. The other stays lit — always. Then slice yourself a piece.</p>
   </div>
@@ -948,16 +948,16 @@
   <button class="mic-btn reveal" id="micBtn">🎤 Blow into your mic</button>
   <div class="mic-status" id="micStatus"></div>
   <button class="quiz-restart tap-to-blow-btn" id="tapToBlowBtn">Mic not working? Tap to blow instead</button>
-  <div class="wish-reveal" id="wishReveal">Whatever you wished for — I hope I get to be part of it.</div>
+  <div class="wish-reveal" id="wishReveal">May all your wishes come true, and may your heart always be filled with happiness 💖</div>
   <button class="quiz-restart candle-replay-btn" id="candleReplayBtn">Light it again</button>
 </section>
 
 <!-- ================= COMPLIMENT GENERATOR ================= -->
 <section id="compliment" class="slide">
   <div class="section-head reveal">
-    <div class="eyebrow">Whenever you need it</div>
-    <h2>Tell Me Something</h2>
-    <p>Tap the button for a random reason I'm obsessed with you.</p>
+    <div class="eyebrow">Kuch achi achi baatein (in your words)!!</div>
+    <h2>See you soon</h2>
+    <p>Tap the button for random thoughts</p>
   </div>
   <div class="compliment-card reveal">
     <div class="compliment-text" id="complimentText">Tap below to find out ❤️</div>
@@ -995,13 +995,13 @@
     <!-- Shake for a Secret (uses iPhone motion sensors) -->
     <div class="game-card stagger-item">
       <h3>Shake for a Secret 📱</h3>
-      <p class="game-desc">Now shake your phone to relive some precious happy moments!</p>
+      <p class="game-desc">Now shake your phone to reveal the secret!</p>
       <div class="shake-box">
         <div class="shake-icon" id="shakeIcon">🤫</div>
         <button class="mic-btn" id="shakeEnableBtn">Enable & shake</button>
         <div class="mic-status" id="shakeStatus"></div>
         <!-- SHAKE SECRET: edit this hidden message -->
-        <div class="shake-secret-msg" id="shakeSecretMsg">Here's to many more moments like these 💌</div>
+        <div class="shake-secret-msg" id="shakeSecretMsg">Some precious happy moments!</div>
         <button class="quiz-restart shake-replay-btn" id="shakeReplayBtn">Play again</button>
       </div>
     </div>
@@ -1014,8 +1014,8 @@
     <div class="code-form" id="codeForm">
       <div class="eyebrow" style="color:var(--gold);">One last thing</div>
       <h2 style="color:var(--cream); margin-top:0.5rem;">Enter the code to unlock this</h2>
-      <p style="color:rgba(255,243,237,0.8); max-width:420px; margin:0.8rem auto 0;">Four digits. Think about what today means to us.</p>
-      <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="codeInput" placeholder="••••">
+      <p style="color:rgba(255,243,237,0.8); max-width:420px; margin:0.8rem auto 0;">Four digits.</p>
+      <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="codeInput" placeholder="****">
       <div><button class="code-submit-btn" id="codeSubmitBtn">Unlock</button></div>
       <div class="code-error" id="codeError"></div>
       <div class="code-hint">Hint: our birthdays...</div>
@@ -1139,21 +1139,16 @@
   /* ================= COMPLIMENT GENERATOR ================= */
   // COMPLIMENT LIST: add or edit freely, one shows per tap.
   var compliments = [
-    "You make my worst days better.",
-    "You have the cutest laugh, and I mean that every time.",
+    "It doesn't feel like we just met — it feels like we've known each other forever.",
     "I still smile thinking about our conversations.",
-    "You're the most driven person I know.",
-    "Your hugs fix things words can't.",
-    "You make ordinary days feel like a good story.",
-    "I love how you never give up on the things that matter to you.",
-    "You're prettier than you think you are.",
     "Talking to you is my favorite part of the day.",
-    "You make it so easy to be myself around you.",
-    "I love the way you get excited about small things.",
-    "You're stronger than you give yourself credit for.",
+    "I don't know why we didn't talk sooner, but I'm glad we did.",
+    "We naturally feel so connected, like we've known each other for years.",
     "Being around you feels like home.",
-    "You somehow make me want to be better, every day.",
-    "I love you more today than yesterday, and that's saying something."
+    "It's amazing how easily conversations with you flow.",
+    "It feels like we can talk about anything and everything.",
+    "It's rare to find someone you can connect with so naturally.",
+    "Your smile is contagious in the best possible way."
   ];
   var complimentTextEl = document.getElementById('complimentText');
   var complimentBtn = document.getElementById('complimentBtn');
@@ -1271,7 +1266,7 @@
   }
   var celebrated = false;
   function renderCelebration(){
-    panel.innerHTML = '<div class="eyebrow">It\'s official</div><div class="celebrate-headline">Her birthday is here 🎉</div>';
+    panel.innerHTML = '<div class="eyebrow">It\'s official</div><div class="celebrate-headline">Your birthday is here 🎉</div>';
     if(!celebrated){ celebrated = true; }
   }
   var timer = setInterval(function(){
