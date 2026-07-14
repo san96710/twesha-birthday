@@ -347,6 +347,16 @@
   }
   .music-toggle:hover{ transform:scale(1.08); }
   .music-toggle.playing{ animation:pulse-glow 1.6s ease-in-out infinite; }
+  body.intro-active .music-toggle{ opacity:0; pointer-events:none; }
+
+  .intro-volume-hint{
+    margin-top:1.4rem;
+    font-size:0.72rem;
+    letter-spacing:0.04em;
+    color:rgba(255,243,237,0.45);
+    opacity:0;
+    animation:intro-fade-up 0.7s ease 1.8s forwards;
+  }
 
   /* ---------- HEARTBEAT HOLD ---------- */
   .heartbeat-heart{
@@ -832,7 +842,7 @@
   }
 </style>
 </head>
-<body class="locked">
+<body class="locked intro-active">
 
 <canvas id="ambient-canvas"></canvas>
 <canvas id="confetti-canvas"></canvas>
@@ -892,6 +902,7 @@
       <span class="intro-title-row intro-title-row-name" id="introRow2">Twesha</span>
     </h1>
     <button class="intro-open-btn" id="introOpenBtn">Open your surprise</button>
+    <div class="intro-volume-hint">turn up your volume 🔊</div>
   </div>
 </div>
 
@@ -1095,6 +1106,7 @@
 
   introBtn.addEventListener('click', function(){
     introEl.classList.add('hidden');
+    body.classList.remove('intro-active');
     burstConfetti(70);
     startSlides();
     startBackgroundSong();
