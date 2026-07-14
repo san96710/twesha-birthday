@@ -262,10 +262,17 @@
   }
   .intro-title-row-shimmer{
     font-size:clamp(1.5rem, 6vw, 2.5rem);
-    background:linear-gradient(90deg, var(--cream) 20%, var(--gold) 50%, var(--cream) 80%);
-    background-size:200% auto;
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-    animation:intro-shimmer 3s linear infinite;
+    color:var(--cream); /* fallback if background-clip:text isn't supported */
+    opacity:0; transform:translateY(10px);
+    animation:intro-fade-up 0.7s ease 0.3s forwards;
+  }
+  @supports (background-clip: text) or (-webkit-background-clip: text){
+    .intro-title-row-shimmer{
+      background:linear-gradient(90deg, var(--cream) 20%, var(--gold) 50%, var(--cream) 80%);
+      background-size:200% auto;
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+      animation:intro-fade-up 0.7s ease 0.3s forwards, intro-shimmer 3s linear 1s infinite;
+    }
   }
   @keyframes intro-shimmer{ to{ background-position:-200% center; } }
   .intro-title-row-name{
@@ -720,6 +727,7 @@
   .wish-reveal.show{ opacity:1; transform:translateY(0); }
   .candle-replay-btn{ display:none; margin-top:1.4rem; }
   .wish-reveal.show ~ .candle-replay-btn{ display:inline-block; }
+  .tap-to-blow-btn{ margin-top:0.8rem; font-size:0.8rem; padding:0.5rem 1.1rem; opacity:0.75; }
 
   /* ---- cake + cutting scene ---- */
   .cake-scene{
@@ -907,6 +915,7 @@
   <div class="blow-meter" id="blowMeter"><div class="blow-meter-fill" id="blowMeterFill"></div></div>
   <button class="mic-btn reveal" id="micBtn">🎤 Blow into your mic</button>
   <div class="mic-status" id="micStatus"></div>
+  <button class="quiz-restart tap-to-blow-btn" id="tapToBlowBtn">Mic not working? Tap to blow instead</button>
   <div class="wish-reveal" id="wishReveal">Whatever you wished for — I hope I get to be part of it.</div>
   <button class="quiz-restart candle-replay-btn" id="candleReplayBtn">Light it again</button>
 </section>
@@ -1524,6 +1533,12 @@
     micBtn.disabled = true;
     micStatus.textContent = 'Listening... blow toward your phone 🎤';
 
+    // The background song bleeding out of the speaker and back into the mic
+    // (echo cancellation is off below, on purpose — see note) can drown out
+    // or distort her actual blow, so pause it while we're listening.
+    var songWasPlaying = bgSong && !bgSong.paused;
+    if(songWasPlaying){ bgSong.pause(); }
+
     // Browsers' noise suppression / auto gain control actively flattens breath
     // and wind noise (it thinks it's background noise) — that's the usual reason
     // a "blow into the mic" detector doesn't pick anything up. Ask for raw audio
@@ -1556,6 +1571,7 @@
         stopMicStream();
         audioCtx.close();
         blowMeterFill.style.width = '0%';
+        if(songWasPlaying){ bgSong.play().catch(function(){}); }
       }
 
       function checkVolume(){
@@ -1592,7 +1608,14 @@
     }).catch(function(){
       micStatus.textContent = "Please refresh the page and allow microphone access to blow out the candle.";
       micBtn.disabled = false;
+      if(songWasPlaying){ bgSong.play().catch(function(){}); }
     });
+  });
+
+  var tapToBlowBtn = document.getElementById('tapToBlowBtn');
+  tapToBlowBtn.addEventListener('click', function(){
+    micStatus.textContent = '';
+    blowOut();
   });
 
   /* ================= SHAKE FOR A SECRET (iPhone motion sensors) ================= */
